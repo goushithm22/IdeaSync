@@ -61,46 +61,49 @@ const AnimatedSvg = () => {
     >
       {/* Background grid */}
       <defs>
-        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f5f5f5" strokeWidth="1" />
+        <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+          <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#eee" strokeWidth="1" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#grid)" />
       
-      {/* Central Node - Ideasync */}
-      <circle cx="250" cy="250" r="20" fill="#ff4141" opacity="0.9" className="node" />
-      <text x="250" y="255" fontSize="10" fontWeight="bold" fill="#fff" textAnchor="middle">IS</text>
+      {/* Central Circle - ideasync */}
+      <circle cx="250" cy="250" r="30" fill="#ff4141" className="node" />
+      <text x="250" y="255" fontSize="12" fontWeight="bold" fill="#fff" textAnchor="middle">IS</text>
       
-      {/* Investor Nodes */}
-      <circle cx="150" cy="150" r="6" fill="#666" className="node" />
-      <circle cx="100" cy="250" r="6" fill="#666" className="node" />
-      <circle cx="180" cy="350" r="6" fill="#666" className="node" />
-      <text x="150" y="130" fontSize="10" fill="#666" textAnchor="middle">Investor</text>
+      {/* Surrounding small circles */}
+      <circle cx="150" cy="150" r="10" fill="#666" className="node" />
+      <circle cx="350" cy="150" r="10" fill="#666" className="node" />
+      <circle cx="150" cy="350" r="10" fill="#666" className="node" />
+      <circle cx="350" cy="350" r="10" fill="#666" className="node" />
+      <circle cx="100" cy="250" r="10" fill="#666" className="node" />
+      <circle cx="400" cy="250" r="10" fill="#666" className="node" />
       
-      {/* Founder Nodes */}
-      <circle cx="350" cy="150" r="6" fill="#666" className="node" />
-      <circle cx="400" cy="250" r="6" fill="#666" className="node" />
-      <circle cx="320" cy="350" r="6" fill="#666" className="node" />
-      <text x="350" y="130" fontSize="10" fill="#666" textAnchor="middle">Founder</text>
+      {/* Text labels */}
+      <text x="150" y="135" fontSize="10" fill="#666" textAnchor="middle">Investor</text>
+      <text x="350" y="135" fontSize="10" fill="#666" textAnchor="middle">Founder</text>
+      <text x="150" y="370" fontSize="10" fill="#666" textAnchor="middle">Investor</text>
+      <text x="350" y="370" fontSize="10" fill="#666" textAnchor="middle">Founder</text>
+      <text x="85" y="235" fontSize="10" fill="#666" textAnchor="middle">Investor</text>
+      <text x="415" y="235" fontSize="10" fill="#666" textAnchor="middle">Founder</text>
       
-      {/* Network Links */}
-      <line x1="150" y1="150" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
-      <line x1="100" y1="250" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
-      <line x1="180" y1="350" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
+      {/* Connecting lines to center */}
+      <line x1="150" y1="150" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.7" className="link" />
+      <line x1="350" y1="150" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.7" className="link" />
+      <line x1="150" y1="350" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.7" className="link" />
+      <line x1="350" y1="350" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.7" className="link" />
+      <line x1="100" y1="250" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.7" className="link" />
+      <line x1="400" y1="250" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.7" className="link" />
       
-      <line x1="350" y1="150" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
-      <line x1="400" y1="250" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
-      <line x1="320" y1="350" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
+      {/* Connecting lines between investors and founders */}
+      <line x1="150" y1="150" x2="350" y2="150" stroke="#ff4141" strokeWidth="1" strokeDasharray="5 3" opacity="0.5" className="link" />
+      <line x1="150" y1="350" x2="350" y2="350" stroke="#ff4141" strokeWidth="1" strokeDasharray="5 3" opacity="0.5" className="link" />
+      <line x1="100" y1="250" x2="400" y2="250" stroke="#ff4141" strokeWidth="1" strokeDasharray="5 3" opacity="0.5" className="link" />
       
-      {/* Connecting Lines between some investors and founders */}
-      <line x1="150" y1="150" x2="350" y2="150" stroke="#ff4141" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" className="link" />
-      <line x1="100" y1="250" x2="400" y2="250" stroke="#ff4141" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" className="link" />
-      <line x1="180" y1="350" x2="320" y2="350" stroke="#ff4141" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" className="link" />
-      
-      {/* Dollar symbols near connections */}
+      {/* Dollar symbols near connecting lines */}
       <text x="250" y="145" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
-      <text x="250" y="245" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
-      <text x="250" y="345" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
+      <text x="250" y="355" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
+      <text x="250" y="235" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
     </svg>
   );
 };
