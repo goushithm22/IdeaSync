@@ -9,29 +9,43 @@ const AnimatedSvg = () => {
     if (!svg) return;
     
     // Add animation logic here
-    const icons = svg.querySelectorAll('.icon');
+    const nodes = svg.querySelectorAll('.node');
+    const links = svg.querySelectorAll('.link');
     
-    icons.forEach((icon, index) => {
-      // Create animation
-      const animateOpacity = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-      animateOpacity.setAttribute('attributeName', 'opacity');
-      animateOpacity.setAttribute('values', '0.8;1;0.8');
-      animateOpacity.setAttribute('dur', '3s');
-      animateOpacity.setAttribute('begin', `${index * 0.5}s`);
-      animateOpacity.setAttribute('repeatCount', 'indefinite');
+    // Animate nodes
+    nodes.forEach((node, index) => {
+      // Create animation for nodes
+      const animatePulse = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+      animatePulse.setAttribute('attributeName', 'r');
+      animatePulse.setAttribute('values', '6;8;6');
+      animatePulse.setAttribute('dur', '3s');
+      animatePulse.setAttribute('begin', `${index * 0.5}s`);
+      animatePulse.setAttribute('repeatCount', 'indefinite');
       
-      icon.appendChild(animateOpacity);
+      node.appendChild(animatePulse);
       
       // Add hover effect handler
-      icon.addEventListener('mouseenter', () => {
-        icon.setAttribute('opacity', '1');
-        icon.setAttribute('transform', 'scale(1.1)');
+      node.addEventListener('mouseenter', () => {
+        node.setAttribute('r', '10');
+        node.setAttribute('fill', '#ff4141');
       });
       
-      icon.addEventListener('mouseleave', () => {
-        icon.setAttribute('opacity', '0.8');
-        icon.setAttribute('transform', 'scale(1)');
+      node.addEventListener('mouseleave', () => {
+        node.setAttribute('r', '6');
+        node.setAttribute('fill', '#666');
       });
+    });
+    
+    // Animate links
+    links.forEach((link, index) => {
+      const animateOpacity = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+      animateOpacity.setAttribute('attributeName', 'opacity');
+      animateOpacity.setAttribute('values', '0.2;0.5;0.2');
+      animateOpacity.setAttribute('dur', '4s');
+      animateOpacity.setAttribute('begin', `${index * 0.3}s`);
+      animateOpacity.setAttribute('repeatCount', 'indefinite');
+      
+      link.appendChild(animateOpacity);
     });
     
   }, []);
@@ -45,68 +59,48 @@ const AnimatedSvg = () => {
       className="w-full max-w-md mx-auto"
       style={{ maxWidth: "100%", height: "auto" }}
     >
-      {/* Center circle with "IS" */}
-      <circle cx="250" cy="250" r="50" fill="#fff0f0" />
-      <circle cx="250" cy="250" r="40" fill="#ffdddd" />
-      <circle cx="250" cy="250" r="30" fill="#ff4141" opacity="0.6" />
-      <text x="250" y="258" fontSize="24" fontWeight="bold" fill="#fff" textAnchor="middle">IS</text>
+      {/* Background grid */}
+      <defs>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f5f5f5" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" />
       
-      {/* Outer circle */}
-      <circle cx="250" cy="250" r="180" fill="none" stroke="#f0f0f0" strokeWidth="1" />
+      {/* Central Node - Ideasync */}
+      <circle cx="250" cy="250" r="20" fill="#ff4141" opacity="0.9" className="node" />
+      <text x="250" y="255" fontSize="10" fontWeight="bold" fill="#fff" textAnchor="middle">IS</text>
       
-      {/* Small decorative circles */}
-      <circle cx="300" cy="150" r="3" fill="#e0e0e0" />
-      <circle cx="350" cy="320" r="4" fill="#e0e0e0" />
-      <circle cx="150" cy="350" r="3" fill="#e0e0e0" />
-      <circle cx="200" cy="100" r="2" fill="#e0e0e0" />
-      <circle cx="400" cy="250" r="2" fill="#e0e0e0" />
+      {/* Investor Nodes */}
+      <circle cx="150" cy="150" r="6" fill="#666" className="node" />
+      <circle cx="100" cy="250" r="6" fill="#666" className="node" />
+      <circle cx="180" cy="350" r="6" fill="#666" className="node" />
+      <text x="150" y="130" fontSize="10" fill="#666" textAnchor="middle">Investor</text>
       
-      {/* User icon (top) */}
-      <g className="icon" opacity="0.8" transform="translate(250, 100)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <path d="M-8,0 a8,8 0 1,1 16,0 a8,8 0 1,1 -16,0" fill="#333" />
-        <path d="M8,0 a8,8 0 1,1 16,0 a8,8 0 1,1 -16,0" fill="#333" />
-      </g>
+      {/* Founder Nodes */}
+      <circle cx="350" cy="150" r="6" fill="#666" className="node" />
+      <circle cx="400" cy="250" r="6" fill="#666" className="node" />
+      <circle cx="320" cy="350" r="6" fill="#666" className="node" />
+      <text x="350" y="130" fontSize="10" fill="#666" textAnchor="middle">Founder</text>
       
-      {/* Heart icon (left) */}
-      <g className="icon" opacity="0.8" transform="translate(120, 190)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <path d="M0,10 L-14,-6 Q-20,-12 -14,-18 T0,-6 L0,-6 L0,-6 Q6,-12 12,-6 T0,10" fill="#333" />
-      </g>
+      {/* Network Links */}
+      <line x1="150" y1="150" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
+      <line x1="100" y1="250" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
+      <line x1="180" y1="350" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
       
-      {/* Money icon (bottom left) */}
-      <g className="icon" opacity="0.8" transform="translate(120, 310)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <text x="0" y="8" fontSize="24" fontWeight="bold" fill="#333" textAnchor="middle">$</text>
-      </g>
+      <line x1="350" y1="150" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
+      <line x1="400" y1="250" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
+      <line x1="320" y1="350" x2="250" y2="250" stroke="#ccc" strokeWidth="1" opacity="0.3" className="link" />
       
-      {/* Target icon (bottom) */}
-      <g className="icon" opacity="0.8" transform="translate(250, 400)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <circle cx="0" cy="0" r="20" fill="none" stroke="#333" strokeWidth="2" />
-        <circle cx="0" cy="0" r="10" fill="none" stroke="#333" strokeWidth="2" />
-        <circle cx="0" cy="0" r="3" fill="#333" />
-      </g>
+      {/* Connecting Lines between some investors and founders */}
+      <line x1="150" y1="150" x2="350" y2="150" stroke="#ff4141" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" className="link" />
+      <line x1="100" y1="250" x2="400" y2="250" stroke="#ff4141" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" className="link" />
+      <line x1="180" y1="350" x2="320" y2="350" stroke="#ff4141" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" className="link" />
       
-      {/* Rocket icon (bottom right) */}
-      <g className="icon" opacity="0.8" transform="translate(380, 310)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <path d="M-5,-15 L0,-20 L5,-15 L5,5 L-5,5 Z" fill="#333" />
-        <path d="M-8,5 L-5,15 L0,10 L5,15 L8,5 Z" fill="#333" />
-      </g>
-      
-      {/* Graph icon (right) */}
-      <g className="icon" opacity="0.8" transform="translate(380, 190)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <path d="M-15,10 L-5,-5 L5,5 L15,-10" fill="none" stroke="#333" strokeWidth="2" />
-      </g>
-      
-      {/* Briefcase icon (top right) */}
-      <g className="icon" opacity="0.8" transform="translate(370, 120)" style={{ transition: "all 0.3s ease" }}>
-        <circle cx="0" cy="0" r="30" fill="#f8f8f8" />
-        <path d="M-12,-5 L-12,15 L12,15 L12,-5 Z" fill="none" stroke="#333" strokeWidth="2" />
-        <path d="M-5,-5 L-5,-10 L5,-10 L5,-5" fill="none" stroke="#333" strokeWidth="2" />
-      </g>
+      {/* Dollar symbols near connections */}
+      <text x="250" y="145" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
+      <text x="250" y="245" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
+      <text x="250" y="345" fontSize="12" fill="#ff4141" textAnchor="middle">$</text>
     </svg>
   );
 };
