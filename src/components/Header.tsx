@@ -14,14 +14,14 @@ const Header = () => {
         to="/" 
         className="text-xl font-semibold tracking-tighter text-gray-900"
       >
-        ideasync
+        <span className="text-[#ff4141]">idea</span>sync
       </Link>
       
       <div className="flex gap-4">
         {user ? (
           <>
             <span className="text-sm text-gray-600 self-center mr-2">
-              {user.name} ({user.role})
+              {user.name} <span className="text-[#ff4141]">({user.role})</span>
             </span>
             <Button 
               variant="outline" 
@@ -29,6 +29,7 @@ const Header = () => {
                 logout();
                 navigate("/");
               }}
+              className="border-[#ff4141] text-[#ff4141] hover:bg-[#ff4141]/10"
             >
               Sign Out
             </Button>
@@ -38,12 +39,13 @@ const Header = () => {
             <Button
               variant="outline"
               onClick={() => navigate("/signin")}
+              className="border-[#ff4141] text-[#ff4141] hover:bg-[#ff4141]/10"
             >
               Sign In
             </Button>
             <Button
               onClick={() => navigate("/register")}
-              className="bg-gray-900 hover:bg-gray-800 text-white"
+              className="bg-[#ff4141] hover:bg-[#ff4141]/90 text-white"
             >
               Register
             </Button>
