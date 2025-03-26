@@ -50,6 +50,8 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    --brand-color: 0 100% 63%;
   }
 
   .dark {
@@ -88,6 +90,8 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    --brand-color: 0 100% 63%;
   }
 }
 
@@ -98,6 +102,14 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+  
+  input, select, textarea {
+    @apply transition-all duration-200 focus:border-[#ff4141]/50 focus:ring-[#ff4141]/30;
+  }
+  
+  button {
+    @apply transition-all duration-300;
   }
 }
 
@@ -142,6 +154,34 @@
   animation: float 4s ease-in-out infinite;
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255, 65, 65, 0) 25%, rgba(255, 65, 65, 0.2) 50%, rgba(255, 65, 65, 0) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce 3s ease-in-out infinite;
+}
+
 /* Button hover effect */
 .btn-hover-effect {
   transition: all 0.3s ease;
@@ -149,7 +189,7 @@
 
 .btn-hover-effect:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(255, 65, 65, 0.2);
 }
 
 /* Card hover effects */
@@ -159,5 +199,38 @@
 
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 20px rgba(255, 65, 65, 0.1);
+  border-color: rgba(255, 65, 65, 0.3);
+}
+
+/* Form element focus effects */
+input:focus, select:focus, textarea:focus {
+  box-shadow: 0 0 0 2px rgba(255, 65, 65, 0.2);
+}
+
+/* Brand text gradient */
+.brand-text-gradient {
+  background: linear-gradient(90deg, #ff4141, #ff7a41);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom scrollbar with brand color */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 65, 65, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 65, 65, 0.7);
 }
