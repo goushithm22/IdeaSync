@@ -35,9 +35,9 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
         <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 flex items-center">
           <TrendingUp className="h-3 w-3 mr-1 text-[#ff4141]" /> {company.sector}
         </span>
-        {company.founders && (
+        {company.founderCount && (
           <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 flex items-center">
-            <Users className="h-3 w-3 mr-1 text-[#ff4141]" /> {company.founders} founders
+            <Users className="h-3 w-3 mr-1 text-[#ff4141]" /> {company.founderCount} founders
           </span>
         )}
       </div>
