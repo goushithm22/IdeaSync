@@ -4,7 +4,7 @@ import { Users, Lightbulb, DollarSign, ArrowRight } from "lucide-react";
 
 const AnimatedSvg = () => {
   return (
-    <div className="w-full max-w-lg mx-auto flex items-center justify-center">
+    <div className="w-full max-w-lg mx-auto bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-shadow duration-300">
       <svg 
         width="100%" 
         height="300" 
@@ -12,69 +12,55 @@ const AnimatedSvg = () => {
         className="max-w-full"
       >
         {/* Background */}
-        <rect width="500" height="300" fill="white" rx="8" ry="8" />
+        <rect width="500" height="300" fill="white" rx="12" ry="12" />
         
         {/* Main Circle */}
-        <circle cx="250" cy="150" r="120" fill="#f8f8f8" stroke="#ff4141" strokeWidth="2" strokeDasharray="4,2" />
+        <circle cx="250" cy="150" r="120" fill="#f9f9f9" stroke="#ff4141" strokeWidth="1.5" strokeDasharray="4,2" />
         
         {/* Central Platform */}
-        <circle cx="250" cy="150" r="40" fill="#ff4141" />
+        <circle cx="250" cy="150" r="35" fill="#ff4141" />
         <text x="250" y="155" fontSize="12" fontWeight="bold" fill="white" textAnchor="middle">ideasync</text>
         
-        {/* Founders Node */}
-        <circle cx="160" cy="150" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
+        {/* Nodes - Clean simplified style */}
+        <circle cx="160" cy="150" r="25" fill="white" stroke="#ff4141" strokeWidth="1.5" />
+        <circle cx="340" cy="150" r="25" fill="white" stroke="#ff4141" strokeWidth="1.5" />
+        <circle cx="250" cy="60" r="25" fill="white" stroke="#ff4141" strokeWidth="1.5" />
+        <circle cx="250" cy="240" r="25" fill="white" stroke="#ff4141" strokeWidth="1.5" />
         
-        {/* Investors Node */}
-        <circle cx="340" cy="150" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
+        {/* Connecting Lines - Thinner, cleaner */}
+        <path d="M 185,150 L 215,150" stroke="#ff4141" strokeWidth="1.5" />
+        <path d="M 285,150 L 315,150" stroke="#ff4141" strokeWidth="1.5" />
+        <path d="M 250,85 L 250,115" stroke="#ff4141" strokeWidth="1.5" />
+        <path d="M 250,185 L 250,215" stroke="#ff4141" strokeWidth="1.5" />
         
-        {/* Ideas Node */}
-        <circle cx="250" cy="60" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
-        
-        {/* Investment Node */}
-        <circle cx="250" cy="240" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
-        
-        {/* Connecting Lines */}
-        <path d="M 190,150 L 210,150" stroke="#ff4141" strokeWidth="2" />
-        <path d="M 290,150 L 310,150" stroke="#ff4141" strokeWidth="2" />
-        <path d="M 250,90 L 250,110" stroke="#ff4141" strokeWidth="2" />
-        <path d="M 250,190 L 250,210" stroke="#ff4141" strokeWidth="2" />
-        
-        {/* Arrows on Lines */}
+        {/* Direction indicators - Small circles */}
         <circle cx="205" cy="150" r="3" fill="#ff4141" />
         <circle cx="295" cy="150" r="3" fill="#ff4141" />
         <circle cx="250" cy="105" r="3" fill="#ff4141" />
         <circle cx="250" cy="195" r="3" fill="#ff4141" />
         
-        {/* Icons */}
-        <svg x="145" y="135" width="30" height="30">
-          <rect width="30" height="30" fill="none" />
-          <path d="M17 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2m1 10.25a11 11 0 1 0-14 0M14 21a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" 
-            stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        {/* Icons - Clean and minimal */}
+        <svg x="147" y="137" width="26" height="26">
+          <Users size={26} stroke="#555" strokeWidth={1.5} />
         </svg>
         
-        <svg x="325" y="135" width="30" height="30">
-          <rect width="30" height="30" fill="none" />
-          <path d="M12 8a4 4 0 0 1 8 0M18 16a4 4 0 0 0-8 0m-.7 7 8.7 3.3 8.7-3.3M12 16c-2.76 0-5 2.24-5 5v2h10v-2c0-2.76-2.24-5-5-5Z" 
-            stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <svg x="327" y="137" width="26" height="26">
+          <Users size={26} stroke="#555" strokeWidth={1.5} />
         </svg>
         
-        <svg x="235" y="45" width="30" height="30">
-          <rect width="30" height="30" fill="none" />
-          <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7Z" 
-            stroke="#333" strokeWidth="2" fill="none" />
-          <path d="M10 22v-1h4v1m-2-7v3" stroke="#333" strokeWidth="2" fill="none" />
+        <svg x="237" y="47" width="26" height="26">
+          <Lightbulb size={26} stroke="#555" strokeWidth={1.5} />
         </svg>
         
-        <svg x="235" y="225" width="30" height="30">
-          <rect width="30" height="30" fill="none" />
-          <path d="M12 2v20m4-16 4-4-4 4-4-4 4 4Z" stroke="#333" strokeWidth="2" fill="none" />
+        <svg x="237" y="227" width="26" height="26">
+          <DollarSign size={26} stroke="#555" strokeWidth={1.5} />
         </svg>
         
-        {/* Labels */}
-        <text x="160" y="195" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Founders</text>
-        <text x="340" y="195" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Investors</text>
-        <text x="250" y="30" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Ideas</text>
-        <text x="250" y="280" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Investment</text>
+        {/* Labels - Smaller, cleaner font */}
+        <text x="160" y="190" fontSize="11" fill="#555" textAnchor="middle">Founders</text>
+        <text x="340" y="190" fontSize="11" fill="#555" textAnchor="middle">Investors</text>
+        <text x="250" y="35" fontSize="11" fill="#555" textAnchor="middle">Ideas</text>
+        <text x="250" y="275" fontSize="11" fill="#555" textAnchor="middle">Investment</text>
       </svg>
     </div>
   );
