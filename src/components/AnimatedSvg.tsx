@@ -14,73 +14,67 @@ const AnimatedSvg = () => {
         {/* Background */}
         <rect width="500" height="300" fill="white" rx="8" ry="8" />
         
-        {/* Connecting Line */}
-        <path 
-          d="M 120,150 L 380,150" 
-          stroke="#ff4141" 
-          strokeWidth="3" 
-          strokeDasharray="10,5" 
-        />
+        {/* Main Circle */}
+        <circle cx="250" cy="150" r="120" fill="#f8f8f8" stroke="#ff4141" strokeWidth="2" strokeDasharray="4,2" />
         
-        {/* Founder Circle */}
-        <circle cx="120" cy="150" r="60" fill="#f8f8f8" stroke="#ff4141" strokeWidth="2" />
-        
-        {/* Investor Circle */}
-        <circle cx="380" cy="150" r="60" fill="#f8f8f8" stroke="#ff4141" strokeWidth="2" />
-        
-        {/* Center Platform */}
+        {/* Central Platform */}
         <circle cx="250" cy="150" r="40" fill="#ff4141" />
         <text x="250" y="155" fontSize="12" fontWeight="bold" fill="white" textAnchor="middle">ideasync</text>
         
+        {/* Founders Node */}
+        <circle cx="160" cy="150" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
+        
+        {/* Investors Node */}
+        <circle cx="340" cy="150" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
+        
+        {/* Ideas Node */}
+        <circle cx="250" cy="60" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
+        
+        {/* Investment Node */}
+        <circle cx="250" cy="240" r="30" fill="white" stroke="#ff4141" strokeWidth="2" />
+        
+        {/* Connecting Lines */}
+        <path d="M 190,150 L 210,150" stroke="#ff4141" strokeWidth="2" />
+        <path d="M 290,150 L 310,150" stroke="#ff4141" strokeWidth="2" />
+        <path d="M 250,90 L 250,110" stroke="#ff4141" strokeWidth="2" />
+        <path d="M 250,190 L 250,210" stroke="#ff4141" strokeWidth="2" />
+        
+        {/* Arrows on Lines */}
+        <circle cx="205" cy="150" r="3" fill="#ff4141" />
+        <circle cx="295" cy="150" r="3" fill="#ff4141" />
+        <circle cx="250" cy="105" r="3" fill="#ff4141" />
+        <circle cx="250" cy="195" r="3" fill="#ff4141" />
+        
         {/* Icons */}
-        <svg x="95" y="125" width="50" height="50">
-          <rect width="50" height="50" fill="none" />
-          <path d="M17 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2m1 10.25a11 11 0 1 0-14 0M14 21a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm14 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" 
+        <svg x="145" y="135" width="30" height="30">
+          <rect width="30" height="30" fill="none" />
+          <path d="M17 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2m1 10.25a11 11 0 1 0-14 0M14 21a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" 
             stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
         
-        <svg x="355" y="125" width="50" height="50">
-          <rect width="50" height="50" fill="none" />
+        <svg x="325" y="135" width="30" height="30">
+          <rect width="30" height="30" fill="none" />
           <path d="M12 8a4 4 0 0 1 8 0M18 16a4 4 0 0 0-8 0m-.7 7 8.7 3.3 8.7-3.3M12 16c-2.76 0-5 2.24-5 5v2h10v-2c0-2.76-2.24-5-5-5Z" 
             stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
         
-        <svg x="230" y="100" width="40" height="40">
-          <rect width="40" height="40" fill="none" />
-          <path d="M12 6v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6M6 12H3v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8h-3" 
-            stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <svg x="235" y="45" width="30" height="30">
+          <rect width="30" height="30" fill="none" />
+          <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7Z" 
+            stroke="#333" strokeWidth="2" fill="none" />
+          <path d="M10 22v-1h4v1m-2-7v3" stroke="#333" strokeWidth="2" fill="none" />
+        </svg>
+        
+        <svg x="235" y="225" width="30" height="30">
+          <rect width="30" height="30" fill="none" />
+          <path d="M12 2v20m4-16 4-4-4 4-4-4 4 4Z" stroke="#333" strokeWidth="2" fill="none" />
         </svg>
         
         {/* Labels */}
-        <text x="120" y="230" fontSize="14" fontWeight="bold" fill="#333" textAnchor="middle">Founders</text>
-        <text x="380" y="230" fontSize="14" fontWeight="bold" fill="#333" textAnchor="middle">Investors</text>
-        
-        {/* Arrows */}
-        <path d="M 180,150 L 210,150" stroke="#ff4141" strokeWidth="2" markerEnd="url(#arrowhead)" />
-        <path d="M 290,150 L 320,150" stroke="#ff4141" strokeWidth="2" markerEnd="url(#arrowhead)" />
-        
-        {/* Arrow Marker */}
-        <defs>
-          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#ff4141" />
-          </marker>
-        </defs>
-        
-        {/* Ideas & Investment */}
-        <text x="90" y="100" fontSize="12" fill="#333" textAnchor="middle">Ideas</text>
-        <text x="410" y="100" fontSize="12" fill="#333" textAnchor="middle">Investment</text>
-        
-        <svg x="75" y="70" width="30" height="30">
-          <rect width="30" height="30" fill="none" />
-          <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7Z" 
-            stroke="#ff4141" strokeWidth="2" fill="#fff" />
-          <path d="M10 22v-1h4v1m-2-7v3" stroke="#ff4141" strokeWidth="2" fill="none" />
-        </svg>
-        
-        <svg x="395" y="70" width="30" height="30">
-          <rect width="30" height="30" fill="none" />
-          <path d="M12 2v20m4-16 4-4-4 4-4-4 4 4Z" stroke="#ff4141" strokeWidth="2" fill="none" />
-        </svg>
+        <text x="160" y="195" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Founders</text>
+        <text x="340" y="195" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Investors</text>
+        <text x="250" y="30" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Ideas</text>
+        <text x="250" y="280" fontSize="12" fontWeight="bold" fill="#333" textAnchor="middle">Investment</text>
       </svg>
     </div>
   );
