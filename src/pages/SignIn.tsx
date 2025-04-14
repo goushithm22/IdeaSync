@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -29,11 +29,11 @@ const SignIn = () => {
         title: "Success",
         description: "Login successful",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Invalid email or password",
+        description: error.message || "Invalid email or password",
         variant: "destructive",
       });
     } finally {
@@ -42,7 +42,7 @@ const SignIn = () => {
   };
 
   // Redirect if user is already logged in
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       navigate(user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
     }

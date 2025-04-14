@@ -9,7 +9,107 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          contact_details: string | null
+          created_at: string
+          description: string | null
+          founder_id: string
+          funding_goal: number | null
+          id: string
+          name: string
+          pitch_deck: string | null
+          sector: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_details?: string | null
+          created_at?: string
+          description?: string | null
+          founder_id: string
+          funding_goal?: number | null
+          id?: string
+          name: string
+          pitch_deck?: string | null
+          sector?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_details?: string | null
+          created_at?: string
+          description?: string | null
+          founder_id?: string
+          funding_goal?: number | null
+          id?: string
+          name?: string
+          pitch_deck?: string | null
+          sector?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      investments: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          id: string
+          investor_id: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          id?: string
+          investor_id: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          id?: string
+          investor_id?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

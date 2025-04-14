@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types";
@@ -18,7 +18,7 @@ const Register = () => {
   const [role, setRole] = useState<UserRole>("founder");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { register } = useAuth();
+  const { register, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -41,22 +41,27 @@ const Register = () => {
       
       toast({
         title: "Success",
-        description: "Registration successful",
+        description: "Registration successful. Please check your email to confirm your account.",
       });
       
-      // Redirect based on user role
-      navigate(role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast({
         title: "Error",
-        description: "Registration failed",
+        description: error.message || "Registration failed",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 animate-fade-in">
