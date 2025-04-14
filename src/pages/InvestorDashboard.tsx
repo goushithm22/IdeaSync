@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -33,6 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 // Schema for investor profile form validation
 const investorProfileSchema = z.object({
@@ -54,6 +54,7 @@ const InvestorDashboard = () => {
   const [selectedSector, setSelectedSector] = useState<string>("");
   const [activeTab, setActiveTab] = useState("discover");
   const [profileSaved, setProfileSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Default form values - could be loaded from localStorage or API
   const defaultValues: Partial<InvestorProfileFormValues> = {
@@ -89,54 +90,44 @@ const InvestorDashboard = () => {
     toast("Profile saved successfully!");
   };
   
-  // Mock data loading
+  // Fetch companies from Supabase
   useEffect(() => {
-    // Mock companies data
-    const mockCompanies: Company[] = [
-      {
-        id: "1",
-        name: "TechNova Solutions",
-        description: "AI-powered software solutions for enterprise businesses",
-        sector: "Technology",
-        founderId: "founder1",
-        fundingGoal: 500000,
-      },
-      {
-        id: "2",
-        name: "MediSync",
-        description: "Healthcare platform connecting patients with specialists",
-        sector: "Healthcare",
-        founderId: "founder2",
-        fundingGoal: 750000,
-      },
-      {
-        id: "3",
-        name: "EduLearn",
-        description: "Online learning platform for K-12 students",
-        sector: "Education",
-        founderId: "founder3",
-        fundingGoal: 300000,
-      },
-      {
-        id: "4",
-        name: "FinTrack",
-        description: "Financial tracking and budgeting app for small businesses",
-        sector: "Finance",
-        founderId: "founder4",
-        fundingGoal: 400000,
-      },
-      {
-        id: "5",
-        name: "ShopSquare",
-        description: "E-commerce platform for small retail businesses",
-        sector: "E-commerce",
-        founderId: "founder5",
-        fundingGoal: 600000,
-      },
-    ];
+    if (!user) return;
+
+    const fetchCompanies = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('companies')
+          .select('*');
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Transform database columns to match our frontend Company type
+        const transformedCompanies: Company[] = data.map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || "",
+          sector: item.sector || "",
+          founderId: item.founder_id,
+          fundingGoal: item.funding_goal,
+          pitchDeck: item.pitch_deck,
+          contactDetails: item.contact_details
+        }));
+        
+        setCompanies(transformedCompanies);
+      } catch (error: any) {
+        console.error("Error fetching companies:", error);
+        toast(`Error loading companies: ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    setCompanies(mockCompanies);
-  }, []);
+    fetchCompanies();
+  }, [user]);
 
   // Protect route
   useEffect(() => {
@@ -157,7 +148,14 @@ const InvestorDashboard = () => {
   const sectors = [...new Set(companies.map(company => company.sector))];
 
   if (!user) {
-    return <div className="p-8 text-center">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse p-8 text-center">
+          <div className="w-12 h-12 border-4 border-t-[#ff4141] border-r-[#ff4141]/60 border-b-[#ff4141]/40 border-l-[#ff4141]/20 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -256,22 +254,36 @@ const InvestorDashboard = () => {
                   </select>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredCompanies.map((company) => (
-                    <CompanyCard 
-                      key={company.id} 
-                      company={company} 
-                      showContactButton={true} 
-                    />
-                  ))}
-                  
-                  {filteredCompanies.length === 0 && (
-                    <div className="col-span-full text-center py-12">
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No startups found</h3>
-                      <p className="text-gray-600">Try adjusting your search or filters</p>
-                    </div>
-                  )}
-                </div>
+                {isLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((placeholder) => (
+                      <div key={placeholder} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 animate-pulse">
+                        <div className="h-6 bg-gray-200 rounded mb-3 w-3/4"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-2 w-1/4"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-4 w-full"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-2 w-full"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-2 w-5/6"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredCompanies.map((company) => (
+                      <CompanyCard 
+                        key={company.id} 
+                        company={company} 
+                        showContactButton={true} 
+                      />
+                    ))}
+                    
+                    {filteredCompanies.length === 0 && (
+                      <div className="col-span-full text-center py-12">
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No startups found</h3>
+                        <p className="text-gray-600">Try adjusting your search or filters</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </>
             )}
             
@@ -414,4 +426,3 @@ const InvestorDashboard = () => {
 };
 
 export default InvestorDashboard;
-

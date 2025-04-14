@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Company } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CompanyFormProps {
   onSave: (company: Omit<Company, "id" | "founderId">) => void;
@@ -17,12 +19,23 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) 
   const [description, setDescription] = useState("");
   const [sector, setSector] = useState("");
   const [fundingGoal, setFundingGoal] = useState<number | undefined>(undefined);
+  const [submitting, setSubmitting] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to save a company",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (!name || !description || !sector) {
       toast({
@@ -33,12 +46,52 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) 
       return;
     }
     
-    onSave({
+    setSubmitting(true);
+    
+    // Create the company object
+    const companyData = {
       name,
       description,
       sector,
-      fundingGoal,
-    });
+      funding_goal: fundingGoal,
+      founder_id: user.id
+    };
+    
+    try {
+      // Insert the company into the database
+      const { data, error } = await supabase
+        .from('companies')
+        .insert(companyData)
+        .select();
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Success",
+        description: "Company saved successfully",
+      });
+      
+      // Call the onSave prop to maintain compatibility
+      onSave({
+        name,
+        description,
+        sector,
+        fundingGoal,
+      });
+      
+      navigate("/founder-dashboard");
+    } catch (error: any) {
+      console.error("Error saving company:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save company",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -100,9 +153,9 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) 
         <Button 
           type="submit" 
           className="bg-gray-900 hover:bg-gray-800 text-white" 
-          disabled={isLoading}
+          disabled={isLoading || submitting}
         >
-          {isLoading ? "Saving..." : "Save Company"}
+          {submitting ? "Saving..." : "Save Company"}
         </Button>
         <Button 
           type="button" 

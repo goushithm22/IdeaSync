@@ -25,16 +25,13 @@ const NewCompany = () => {
   }, [user, navigate]);
 
   const handleSaveCompany = (companyData: Omit<Company, "id" | "founderId">) => {
+    // This function is kept for compatibility with the CompanyForm component
+    // The actual save is now handled in the CompanyForm component
     setIsSubmitting(true);
     
     // Mock saving the company
     setTimeout(() => {
-      toast({
-        title: "Success",
-        description: "Company saved successfully",
-      });
       setIsSubmitting(false);
-      navigate("/founder-dashboard");
     }, 1000);
   };
 
