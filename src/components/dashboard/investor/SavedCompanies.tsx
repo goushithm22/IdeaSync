@@ -7,18 +7,28 @@ import CompanyCard from "@/components/CompanyCard";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const SavedCompanies: React.FC = () => {
   const [savedCompanies, setSavedCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const { user, session, refreshSession } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchSavedCompanies = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
+        console.log("Fetching saved companies for user:", user.id);
+        
         // First get the saved company IDs for this investor
         const { data: savedData, error: savedError } = await supabase
           .from('investments')
@@ -26,18 +36,34 @@ const SavedCompanies: React.FC = () => {
           .eq('investor_id', user.id)
           .eq('status', 'saved');
         
-        if (savedError) throw savedError;
+        if (savedError) {
+          console.error("Error fetching saved investments:", savedError);
+          
+          // If unauthorized, try refreshing the session
+          if (savedError.code === '401' || savedError.message.includes('JWT')) {
+            await refreshSession();
+            throw new Error("Session refreshed. Please try again.");
+          }
+          
+          throw savedError;
+        }
         
         if (savedData && savedData.length > 0) {
-          // Get all company details for the saved companies
           const companyIds = savedData.map(saved => saved.company_id);
+          
+          console.log("Found saved company IDs:", companyIds);
           
           const { data: companiesData, error: companiesError } = await supabase
             .from('companies')
             .select('*')
             .in('id', companyIds);
           
-          if (companiesError) throw companiesError;
+          if (companiesError) {
+            console.error("Error fetching companies data:", companiesError);
+            throw companiesError;
+          }
+          
+          console.log("Fetched companies data:", companiesData ? companiesData.length : 0);
           
           // Transform database columns to match our frontend Company type
           const transformedCompanies: Company[] = (companiesData || []).map(item => ({
@@ -53,18 +79,26 @@ const SavedCompanies: React.FC = () => {
           
           setSavedCompanies(transformedCompanies);
         } else {
+          console.log("No saved companies found");
           setSavedCompanies([]);
         }
       } catch (error: any) {
-        console.error("Error fetching saved companies:", error);
-        toast(`Error loading saved companies: ${error.message}`);
+        console.error("Error in fetchSavedCompanies:", error);
+        setError(error.message);
+        toast.error(`Error loading saved companies: ${error.message}`);
+        
+        // If it's a security error, we might need to redirect to login
+        if (error.message?.includes('security') || error.code === '401') {
+          toast.error("Please sign in again to continue");
+          setTimeout(() => navigate('/signin'), 2000);
+        }
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchSavedCompanies();
-  }, [user]);
+  }, [user, refreshSession, navigate]);
 
   const handleRemoveSaved = async (companyId: string) => {
     if (!user) return;
@@ -83,7 +117,14 @@ const SavedCompanies: React.FC = () => {
       setSavedCompanies(prev => prev.filter(company => company.id !== companyId));
     } catch (error: any) {
       console.error("Error removing saved company:", error);
-      toast(`Error: ${error.message}`);
+      
+      // Try to refresh the session if it's an auth error
+      if (error.code === '401' || error.message.includes('JWT')) {
+        await refreshSession();
+        toast.error("Please try again");
+      } else {
+        toast.error(`Error: ${error.message}`);
+      }
     }
   };
 
@@ -101,6 +142,25 @@ const SavedCompanies: React.FC = () => {
               <div className="h-4 bg-gray-200 rounded mb-2 w-5/6"></div>
             </div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Saved Startups</h1>
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md mb-6">
+          <p className="font-medium">Error loading saved companies</p>
+          <p className="text-sm mt-1">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline" 
+            className="mt-3"
+          >
+            Try Again
+          </Button>
         </div>
       </div>
     );
