@@ -17,6 +17,11 @@ const ConfirmEmail = () => {
   useEffect(() => {
     const handleEmailConfirmation = async () => {
       try {
+        console.log("Current URL:", window.location.href);
+        console.log("Location state:", location);
+        console.log("Hash:", window.location.hash);
+        console.log("Search params:", location.search);
+        
         // Check if we have error information in the URL query params
         const searchParams = new URLSearchParams(location.search);
         const error = searchParams.get("error");
@@ -24,6 +29,7 @@ const ConfirmEmail = () => {
         
         // If there's an error in the URL params, handle it
         if (error) {
+          console.log("Error found in URL params:", error, errorDescription);
           setIsSuccess(false);
           setErrorMessage(errorDescription || error);
           setIsVerifying(false);
@@ -33,12 +39,28 @@ const ConfirmEmail = () => {
           return;
         }
         
+        // Special handling for "redirect path is invalid" error
+        if (window.location.href.includes("error=requested_path_is_invalid") || 
+            window.location.href.includes("redirect_path_is_invalid") ||
+            window.location.href.includes("wbwwpvwydfunhsdeulgj.supabase.co")) {
+          console.log("Detected redirect path invalid error");
+          setIsSuccess(false);
+          setErrorMessage("Redirect URL configuration issue detected. This is a common Supabase configuration error.");
+          setIsVerifying(false);
+          toast("Authentication redirect error. Please try signing in directly.", {
+            style: { backgroundColor: "#fecaca", color: "#7f1d1d" },
+          });
+          return;
+        }
+        
         // Get the hash fragment from the URL
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
+        console.log("Hash params:", Object.fromEntries(params.entries()));
         
         // If we have a type=recovery token, it's a password reset, not email confirmation
         if (params.get("type") === "recovery") {
+          console.log("Password reset detected");
           navigate("/reset-password");
           return;
         }
@@ -47,28 +69,37 @@ const ConfirmEmail = () => {
         const accessToken = params.get("access_token");
         
         if (accessToken) {
+          console.log("Access token found:", accessToken.substring(0, 10) + "...");
           // If we have an access token, the email was successfully confirmed
           setIsSuccess(true);
           toast("Email successfully verified!");
           
-          // Set the session with the access token
-          const { error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: params.get("refresh_token") || "",
-          });
-          
-          if (error) throw error;
-        } else {
-          // If no access token and no error in URL params, look for "requested path is invalid" situation
-          // This happens when the page is loaded directly without proper URL parameters
-          if (window.location.href.includes("wbwwpvwydfunhsdeulgj.supabase.co")) {
-            setIsSuccess(false);
-            setErrorMessage("Redirect path is invalid. This usually happens when Supabase URL configuration is not properly set.");
-            toast("Authentication redirect error. Please try signing in directly.", {
-              style: { backgroundColor: "#fecaca", color: "#7f1d1d" },
+          try {
+            // Set the session with the access token
+            const { error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: params.get("refresh_token") || "",
             });
+            
+            if (error) {
+              console.error("Error setting session:", error);
+              throw error;
+            }
+          } catch (sessionError) {
+            console.error("Session setting error:", sessionError);
+            // Even if session setting fails, still show success as the email was verified
+          }
+        } else {
+          console.log("No access token found in URL");
+          // Try to get the current session as a fallback
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) {
+            console.log("Found existing session");
+            setIsSuccess(true);
+            toast("You're already signed in!");
           } else {
-            // Fallback error for any other cases
+            console.log("No session found either");
+            // No access token and no session - likely an invalid URL
             setIsSuccess(false);
             setErrorMessage("Verification link appears to be invalid or expired.");
             toast("Verification failed. Please request a new verification email.", {
@@ -127,12 +158,12 @@ const ConfirmEmail = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              {errorMessage && errorMessage.includes("Redirect path is invalid") ? (
+              {errorMessage && errorMessage.includes("Redirect URL configuration") ? (
                 <>
                   <Info className="w-16 h-16 mx-auto text-blue-500" />
                   <h2 className="text-2xl font-semibold text-gray-800">Redirect Error</h2>
                   <p className="text-gray-600">
-                    There was a problem with the authentication redirect. This usually happens when Supabase isn't properly configured.
+                    There was a problem with the authentication redirect. This happens when your Supabase URL configuration isn't properly set up.
                   </p>
                   <div className="bg-blue-50 border border-blue-100 p-4 rounded-md text-blue-800 text-sm">
                     <p>Your account may still be verified. Please try signing in directly.</p>

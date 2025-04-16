@@ -28,8 +28,10 @@ const App = () => (
             <Route path="/signin" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
             <Route path="/confirm-email" element={<ConfirmEmail />} />
-            {/* Add a special catch-all route for Supabase redirect error cases */}
+            {/* Add multiple routes for Supabase redirect scenarios */}
             <Route path="/auth/callback" element={<Navigate to="/confirm-email" />} />
+            <Route path="/#access_token=*" element={<Navigate to="/confirm-email" />} />
+            <Route path="/?error=*" element={<Navigate to="/confirm-email" />} />
             <Route path="/founder-dashboard" element={<FounderDashboard />} />
             <Route path="/founder-dashboard/new-company" element={<NewCompany />} />
             <Route path="/investor-dashboard" element={<InvestorDashboard />} />

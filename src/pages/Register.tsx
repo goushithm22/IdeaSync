@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Lock, UserPlus, Building, Briefcase } from "lucide-react";
+import { User, Mail, Lock, UserPlus, Building, Briefcase, AlertCircle } from "lucide-react";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -17,6 +17,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState<UserRole>("founder");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
   
   const { register, user } = useAuth();
   const navigate = useNavigate();
@@ -44,6 +45,8 @@ const Register = () => {
         description: "Registration successful. Please check your email to confirm your account.",
       });
       
+      setRegistrationComplete(true);
+      
     } catch (error: any) {
       console.error(error);
       toast({
@@ -62,6 +65,61 @@ const Register = () => {
       navigate(user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
     }
   }, [user, navigate]);
+
+  if (registrationComplete) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 animate-fade-in">
+        <Card className="w-full max-w-md shadow-lg border-[#ff4141]/10">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl font-bold">
+              <span className="text-[#ff4141]">Check</span> Your Email
+            </CardTitle>
+            <CardDescription className="text-sm text-gray-600">
+              We've sent a confirmation link to your email address
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-6 pt-4">
+            <div className="mx-auto w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center">
+              <Mail className="h-8 w-8 text-[#ff4141]" />
+            </div>
+            
+            <div className="text-center space-y-4">
+              <p className="text-gray-700">
+                We've sent an email to <span className="font-medium">{email}</span>
+              </p>
+              <p className="text-gray-600 text-sm">
+                Click the confirmation link in that email to complete your registration.
+                If you don't see it, check your spam folder.
+              </p>
+            </div>
+            
+            <div className="bg-amber-50 border border-amber-100 p-4 rounded-md flex gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-800">
+                <p className="font-medium">Important Note</p>
+                <p>After clicking the confirmation link, you might see a "redirect path is invalid" error from Supabase. 
+                  This is normal and your account should still be verified. If this happens, just go to the sign-in page and log in normally.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+          
+          <CardFooter className="flex flex-col gap-3">
+            <Button 
+              onClick={() => navigate("/signin")} 
+              className="w-full bg-[#ff4141] hover:bg-[#ff4141]/90 text-white"
+            >
+              Go to Sign In
+            </Button>
+            <p className="text-xs text-gray-500 text-center">
+              Didn't receive the email? Check your spam folder or try again.
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 animate-fade-in">
@@ -183,7 +241,7 @@ const Register = () => {
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Registering...
