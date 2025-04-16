@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle, AlertTriangle, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -10,11 +10,29 @@ import Header from "@/components/Header";
 const ConfirmEmail = () => {
   const [isVerifying, setIsVerifying] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleEmailConfirmation = async () => {
       try {
+        // Check if we have error information in the URL query params
+        const searchParams = new URLSearchParams(location.search);
+        const error = searchParams.get("error");
+        const errorDescription = searchParams.get("error_description");
+        
+        // If there's an error in the URL params, handle it
+        if (error) {
+          setIsSuccess(false);
+          setErrorMessage(errorDescription || error);
+          setIsVerifying(false);
+          toast(`Verification failed: ${errorDescription || error}`, {
+            style: { backgroundColor: "#fecaca", color: "#7f1d1d" },
+          });
+          return;
+        }
+        
         // Get the hash fragment from the URL
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
@@ -41,11 +59,19 @@ const ConfirmEmail = () => {
           
           if (error) throw error;
         } else {
-          // If no access token but we have an error, show error message
-          const errorDescription = params.get("error_description");
-          if (errorDescription) {
+          // If no access token and no error in URL params, look for "requested path is invalid" situation
+          // This happens when the page is loaded directly without proper URL parameters
+          if (window.location.href.includes("wbwwpvwydfunhsdeulgj.supabase.co")) {
             setIsSuccess(false);
-            toast(`Verification failed: ${errorDescription}`, {
+            setErrorMessage("Redirect path is invalid. This usually happens when Supabase URL configuration is not properly set.");
+            toast("Authentication redirect error. Please try signing in directly.", {
+              style: { backgroundColor: "#fecaca", color: "#7f1d1d" },
+            });
+          } else {
+            // Fallback error for any other cases
+            setIsSuccess(false);
+            setErrorMessage("Verification link appears to be invalid or expired.");
+            toast("Verification failed. Please request a new verification email.", {
               style: { backgroundColor: "#fecaca", color: "#7f1d1d" },
             });
           }
@@ -53,6 +79,7 @@ const ConfirmEmail = () => {
       } catch (error) {
         console.error("Error handling email confirmation:", error);
         setIsSuccess(false);
+        setErrorMessage("An unexpected error occurred during verification.");
         toast("Failed to verify email. Please try again or contact support.", {
           style: { backgroundColor: "#fecaca", color: "#7f1d1d" },
         });
@@ -62,9 +89,13 @@ const ConfirmEmail = () => {
     };
 
     handleEmailConfirmation();
-  }, [navigate]);
+  }, [navigate, location]);
 
   const goToDashboard = () => {
+    navigate("/signin");
+  };
+
+  const tryManualSignIn = () => {
     navigate("/signin");
   };
 
@@ -96,17 +127,38 @@ const ConfirmEmail = () => {
             </div>
           ) : (
             <div className="space-y-6">
-              <AlertTriangle className="w-16 h-16 mx-auto text-amber-500" />
-              <h2 className="text-2xl font-semibold text-gray-800">Verification Failed</h2>
-              <p className="text-gray-600">
-                We couldn't verify your email. This might be because the link has expired or is invalid.
-              </p>
-              <Button 
-                onClick={() => navigate("/register")} 
-                className="w-full bg-[#ff4141] hover:bg-[#ff4141]/90 text-white"
-              >
-                Try Registering Again
-              </Button>
+              {errorMessage && errorMessage.includes("Redirect path is invalid") ? (
+                <>
+                  <Info className="w-16 h-16 mx-auto text-blue-500" />
+                  <h2 className="text-2xl font-semibold text-gray-800">Redirect Error</h2>
+                  <p className="text-gray-600">
+                    There was a problem with the authentication redirect. This usually happens when Supabase isn't properly configured.
+                  </p>
+                  <div className="bg-blue-50 border border-blue-100 p-4 rounded-md text-blue-800 text-sm">
+                    <p>Your account may still be verified. Please try signing in directly.</p>
+                  </div>
+                  <Button 
+                    onClick={tryManualSignIn} 
+                    className="w-full bg-[#ff4141] hover:bg-[#ff4141]/90 text-white"
+                  >
+                    Go to Sign In
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-16 h-16 mx-auto text-amber-500" />
+                  <h2 className="text-2xl font-semibold text-gray-800">Verification Failed</h2>
+                  <p className="text-gray-600">
+                    {errorMessage || "We couldn't verify your email. This might be because the link has expired or is invalid."}
+                  </p>
+                  <Button 
+                    onClick={() => navigate("/register")} 
+                    className="w-full bg-[#ff4141] hover:bg-[#ff4141]/90 text-white"
+                  >
+                    Try Registering Again
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>

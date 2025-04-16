@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
@@ -28,6 +28,8 @@ const App = () => (
             <Route path="/signin" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
             <Route path="/confirm-email" element={<ConfirmEmail />} />
+            {/* Add a special catch-all route for Supabase redirect error cases */}
+            <Route path="/auth/callback" element={<Navigate to="/confirm-email" />} />
             <Route path="/founder-dashboard" element={<FounderDashboard />} />
             <Route path="/founder-dashboard/new-company" element={<NewCompany />} />
             <Route path="/investor-dashboard" element={<InvestorDashboard />} />
