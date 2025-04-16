@@ -16,11 +16,12 @@ import SavedCompanies from "@/components/dashboard/investor/SavedCompanies";
 import InvestorProfile from "@/components/dashboard/investor/InvestorProfile";
 
 const InvestorDashboard = () => {
-  const { user } = useAuth();
+  const { user, refreshSession } = useAuth();
   const navigate = useNavigate();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [activeTab, setActiveTab] = useState("discover");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Define sidebar items
   const sidebarItems = [
@@ -50,17 +51,29 @@ const InvestorDashboard = () => {
 
     const fetchCompanies = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
+        console.log("Fetching companies for user:", user.id);
+        
         const { data, error } = await supabase
           .from('companies')
           .select('*');
         
         if (error) {
+          // If unauthorized, try refreshing the session
+          if (error.code === '401' || error.message.includes('JWT')) {
+            console.log("Auth error, refreshing session...");
+            await refreshSession();
+            throw new Error("Session refreshed. Please try again.");
+          }
           throw error;
         }
         
+        console.log("Fetched companies:", data ? data.length : 0);
+        
         // Transform database columns to match our frontend Company type
-        const transformedCompanies: Company[] = data.map(item => ({
+        const transformedCompanies: Company[] = (data || []).map(item => ({
           id: item.id,
           name: item.name,
           description: item.description || "",
@@ -74,14 +87,21 @@ const InvestorDashboard = () => {
         setCompanies(transformedCompanies);
       } catch (error: any) {
         console.error("Error fetching companies:", error);
-        toast(`Error loading companies: ${error.message}`);
+        setError(`Error loading companies: ${error.message}`);
+        toast.error(`Error loading companies: ${error.message}`);
+        
+        // If it's a security error, we might need to redirect to login
+        if (error.message?.includes('security') || error.code === '401') {
+          toast.error("Please sign in again to continue");
+          setTimeout(() => navigate('/signin'), 2000);
+        }
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchCompanies();
-  }, [user]);
+  }, [user, refreshSession, navigate]);
 
   // Protect route
   useEffect(() => {
@@ -118,6 +138,19 @@ const InvestorDashboard = () => {
           />
           
           <SidebarInset className="p-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md mb-6">
+                <p className="font-medium">Error</p>
+                <p className="text-sm mt-1">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-3 px-4 py-2 bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+            
             {activeTab === "discover" && (
               <CompanyDiscovery companies={companies} isLoading={isLoading} />
             )}

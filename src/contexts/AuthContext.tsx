@@ -46,21 +46,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshSession = async () => {
     try {
       console.log("Refreshing session...");
+      setIsLoading(true);
+      
       const { data, error } = await supabase.auth.refreshSession();
       
       if (error) {
         console.error("Session refresh error:", error);
-        toast("Session error: " + error.message);
-        return;
+        toast.error("Session error: " + error.message);
+        
+        // If refresh fails, try to get the current session
+        const { data: currentSession } = await supabase.auth.getSession();
+        if (currentSession?.session) {
+          console.log("Got existing session after refresh failure");
+          setSession(currentSession.session);
+          setUser(formatUserFromSession(currentSession.session));
+          return;
+        }
+        
+        throw error;
       }
       
       if (data.session) {
         console.log("Session refreshed successfully");
         setSession(data.session);
         setUser(formatUserFromSession(data.session));
+      } else {
+        console.log("No session after refresh attempt");
+        // Clear the session and user if no session was returned
+        setSession(null);
+        setUser(null);
       }
     } catch (error) {
       console.error("Session refresh exception:", error);
+      // Clear the session and user on refresh errors to prevent stale data
+      setSession(null);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,13 +96,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         // Handle specific auth events
         if (event === 'SIGNED_IN') {
-          toast("Signed in successfully");
+          toast.success("Signed in successfully");
         } else if (event === 'SIGNED_OUT') {
-          toast("Signed out");
+          toast.info("Signed out");
         } else if (event === 'TOKEN_REFRESHED') {
           console.log("Token refreshed automatically");
         } else if (event === 'USER_UPDATED') {
-          toast("User profile updated");
+          toast.success("User profile updated");
         }
       }
     );
