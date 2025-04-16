@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Save } from "lucide-react";
+import { Save, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   Form,
@@ -17,12 +17,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 
 // Schema for investor profile form validation
 const investorProfileSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
   bio: z.string().min(10, { message: "Bio must be at least 10 characters." }).max(500, { message: "Bio cannot exceed 500 characters." }),
-  linkedIn: z.string().url({ message: "Please enter a valid LinkedIn URL." }).optional().or(z.literal("")),
+  linkedIn: z
+    .string()
+    .url({ message: "Please enter a valid LinkedIn URL." })
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (val) => !val || val.includes("linkedin.com/in/"),
+      { message: "LinkedIn URL must be in format: linkedin.com/in/username" }
+    ),
   investmentFocus: z.string().min(5, { message: "Investment focus must be at least 5 characters." }),
   minimumInvestment: z.coerce.number().positive({ message: "Minimum investment must be a positive number." }),
   maximumInvestment: z.coerce.number().positive({ message: "Maximum investment must be a positive number." }),
@@ -36,6 +45,8 @@ interface InvestorProfileProps {
 
 const InvestorProfile: React.FC<InvestorProfileProps> = ({ userName }) => {
   const [profileSaved, setProfileSaved] = useState(false);
+  const [isVerifyingLinkedIn, setIsVerifyingLinkedIn] = useState(false);
+  const [linkedInVerified, setLinkedInVerified] = useState(false);
   
   // Default form values - could be loaded from localStorage or API
   const defaultValues: Partial<InvestorProfileFormValues> = {
@@ -60,6 +71,11 @@ const InvestorProfile: React.FC<InvestorProfileProps> = ({ userName }) => {
       setProfileSaved(true);
       const profileData = JSON.parse(savedProfile);
       form.reset(profileData);
+      
+      // Check if LinkedIn was previously verified
+      if (localStorage.getItem("linkedin_verified") === "true") {
+        setLinkedInVerified(true);
+      }
     }
   }, [form]);
 
@@ -69,6 +85,40 @@ const InvestorProfile: React.FC<InvestorProfileProps> = ({ userName }) => {
     localStorage.setItem("investor_profile", JSON.stringify(data));
     setProfileSaved(true);
     toast("Profile saved successfully!");
+  };
+  
+  // Handle LinkedIn verification
+  const verifyLinkedIn = async () => {
+    const linkedInUrl = form.getValues("linkedIn");
+    
+    if (!linkedInUrl) {
+      toast("Please enter a LinkedIn URL first");
+      return;
+    }
+    
+    setIsVerifyingLinkedIn(true);
+    
+    try {
+      // Simulate verification process - in a real app this would check the URL
+      // through a backend service that validates the user owns the profile
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simple validation - check if URL is properly formatted
+      if (linkedInUrl.includes("linkedin.com/in/")) {
+        setLinkedInVerified(true);
+        localStorage.setItem("linkedin_verified", "true");
+        toast("LinkedIn profile verified successfully!");
+      } else {
+        toast("Invalid LinkedIn URL format. Must be linkedin.com/in/username", {
+          style: { backgroundColor: "#fecaca", color: "#7f1d1d" }
+        });
+      }
+    } catch (error) {
+      console.error("LinkedIn verification error:", error);
+      toast("Failed to verify LinkedIn profile. Please try again.");
+    } finally {
+      setIsVerifyingLinkedIn(false);
+    }
   };
 
   return (
@@ -124,12 +174,41 @@ const InvestorProfile: React.FC<InvestorProfileProps> = ({ userName }) => {
               name="linkedIn"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>LinkedIn URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://linkedin.com/in/yourprofile" {...field} />
-                  </FormControl>
+                  <FormLabel className="flex items-center gap-2">
+                    LinkedIn URL
+                    {linkedInVerified && 
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+                        <Check className="h-3 w-3" /> Verified
+                      </Badge>
+                    }
+                  </FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input 
+                        placeholder="https://linkedin.com/in/yourprofile" 
+                        {...field} 
+                        className={linkedInVerified ? "border-green-500 focus-visible:ring-green-500" : ""}
+                      />
+                    </FormControl>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={verifyLinkedIn}
+                      disabled={isVerifyingLinkedIn || !field.value}
+                      className={linkedInVerified ? "border-green-500 text-green-700" : ""}
+                    >
+                      {isVerifyingLinkedIn ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : linkedInVerified ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        "Verify"
+                      )}
+                    </Button>
+                  </div>
                   <FormDescription>
-                    Optional: Share your professional profile
+                    Verify your LinkedIn profile to build trust with founders
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

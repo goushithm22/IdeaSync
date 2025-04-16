@@ -12,6 +12,7 @@ import FounderDashboard from "./pages/FounderDashboard";
 import InvestorDashboard from "./pages/InvestorDashboard";
 import NewCompany from "./pages/NewCompany";
 import NotFound from "./pages/NotFound";
+import ConfirmEmail from "./pages/ConfirmEmail";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/confirm-email" element={<ConfirmEmail />} />
             <Route path="/founder-dashboard" element={<FounderDashboard />} />
             <Route path="/founder-dashboard/new-company" element={<NewCompany />} />
             <Route path="/investor-dashboard" element={<InvestorDashboard />} />
