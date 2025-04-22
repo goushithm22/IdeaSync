@@ -92,37 +92,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       console.log("Checking Supabase auth settings...");
       
-      // Get the current configuration
-      const { data: authSettings, error } = await supabase.auth.admin.listUsers();
+      // Instead of trying the admin API which requires special permissions,
+      // let's focus on checking capabilities that don't require admin access
       
-      // This will likely fail as the admin APIs are not accessible from the browser
-      // But we can use the error to understand permission boundaries
-      if (error) {
-        console.log("Auth settings check error (expected):", error);
-        
-        // Instead, let's check if we can get basic auth capabilities
-        const { data: gotSession } = await supabase.auth.getSession();
-        console.log("Auth getSession capability:", !!gotSession);
-        
-        // Check if we can do a password recovery (won't send actual email but tests the API)
-        const recoveryEmail = "test@example.com"; // Using a test email
-        const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
-          redirectTo: window.location.origin + "/reset-password",
-        });
-        
-        console.log("Password recovery API check:", recoveryError ? 
-          `Error: ${recoveryError.message}` : 
-          "Password recovery API seems accessible"
-        );
-        
-        toast.info("Auth settings check complete. See console for details.");
-      } else {
-        console.log("Unexpected success accessing admin APIs. Check console:");
-        console.log(authSettings);
-      }
-    } catch (error) {
+      // Check if we can get basic auth capabilities
+      const { data: gotSession } = await supabase.auth.getSession();
+      console.log("Auth getSession capability:", !!gotSession);
+      
+      // Check if we can do a password recovery (won't send actual email but tests the API)
+      const recoveryEmail = "test@example.com"; // Using a test email
+      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+        redirectTo: window.location.origin + "/reset-password",
+      });
+      
+      console.log("Password recovery API check:", recoveryError ? 
+        `Error: ${recoveryError.message}` : 
+        "Password recovery API seems accessible"
+      );
+      
+      toast.info("Auth settings check complete. See console for details.");
+      
+      // Return a summary of the checks
+      return {
+        sessionCapability: !!gotSession,
+        passwordRecoveryCapability: !recoveryError
+      };
+    } catch (error: any) {
       console.error("Auth settings check exception:", error);
       toast.error("Error checking auth settings");
+      throw error;
     }
   };
 
