@@ -13,6 +13,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string, role: UserRole) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
+  checkAuthSettings: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,6 +87,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Check Supabase auth settings
+  const checkAuthSettings = async () => {
+    try {
+      console.log("Checking Supabase auth settings...");
+      
+      // Get the current configuration
+      const { data: authSettings, error } = await supabase.auth.admin.listUsers();
+      
+      // This will likely fail as the admin APIs are not accessible from the browser
+      // But we can use the error to understand permission boundaries
+      if (error) {
+        console.log("Auth settings check error (expected):", error);
+        
+        // Instead, let's check if we can get basic auth capabilities
+        const { data: gotSession } = await supabase.auth.getSession();
+        console.log("Auth getSession capability:", !!gotSession);
+        
+        // Check if we can do a password recovery (won't send actual email but tests the API)
+        const recoveryEmail = "test@example.com"; // Using a test email
+        const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+          redirectTo: window.location.origin + "/reset-password",
+        });
+        
+        console.log("Password recovery API check:", recoveryError ? 
+          `Error: ${recoveryError.message}` : 
+          "Password recovery API seems accessible"
+        );
+        
+        toast.info("Auth settings check complete. See console for details.");
+      } else {
+        console.log("Unexpected success accessing admin APIs. Check console:");
+        console.log(authSettings);
+      }
+    } catch (error) {
+      console.error("Auth settings check exception:", error);
+      toast.error("Error checking auth settings");
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -137,7 +177,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (email: string, password: string, name: string, role: UserRole) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log("Starting registration for:", email);
+      
+      // Check if email already exists
+      const { data: existingUsers, error: checkError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', email)
+        .limit(1);
+      
+      if (checkError) {
+        console.warn("Error checking existing users:", checkError);
+        // Continue with registration attempt despite the error
+      } else if (existingUsers && existingUsers.length > 0) {
+        console.log("Email already exists:", email);
+        throw new Error("Email already exists. Please use a different email address.");
+      }
+
+      console.log("Registering with details:", { email, name, role });
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -145,9 +204,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             name,
             role,
           },
+          emailRedirectTo: `${window.location.origin}/confirm-email`,
         },
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Registration API error:", error);
+        throw error;
+      }
+      
+      console.log("Registration response:", data);
+      
+      if (data.user) {
+        console.log("User created successfully:", data.user.id);
+        console.log("Email confirmation details:", {
+          identityConfirmed: data.user.identities?.[0]?.identity_data?.email_verified,
+          confirmationSent: data.user.confirmation_sent_at,
+          confirmationNeed: !!data.user.confirmation_sent_at && !data.user.confirmed_at
+        });
+        
+        // Show specific message about email confirmation
+        if (data.user.confirmation_sent_at && !data.user.confirmed_at) {
+          toast.success(`Registration successful! Please check your email (${email}) to confirm your account.`);
+        } else {
+          toast.success("Registration successful!");
+        }
+      } else {
+        console.warn("User created but no user data returned");
+        toast.warning("Registration processed but encountered an issue. Please try signing in.");
+      }
     } catch (error: any) {
       console.error("Registration error:", error);
       toast.error("Registration failed: " + error.message);
@@ -174,7 +259,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       login, 
       register, 
       logout,
-      refreshSession 
+      refreshSession,
+      checkAuthSettings
     }}>
       {children}
     </AuthContext.Provider>

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Lock, UserPlus, Building, Briefcase, AlertCircle } from "lucide-react";
+import { User, Mail, Lock, UserPlus, Building, Briefcase, AlertCircle, Info } from "lucide-react";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -18,13 +18,15 @@ const Register = () => {
   const [role, setRole] = useState<UserRole>("founder");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
   
-  const { register, user } = useAuth();
+  const { register, user, checkAuthSettings } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setRegistrationError(null);
     
     if (password !== confirmPassword) {
       toast({
@@ -49,6 +51,7 @@ const Register = () => {
       
     } catch (error: any) {
       console.error(error);
+      setRegistrationError(error.message || "Registration failed");
       toast({
         title: "Error",
         description: error.message || "Registration failed",
@@ -65,6 +68,10 @@ const Register = () => {
       navigate(user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
     }
   }, [user, navigate]);
+
+  const handleCheckAuthSettings = async () => {
+    await checkAuthSettings();
+  };
 
   if (registrationComplete) {
     return (
@@ -103,6 +110,30 @@ const Register = () => {
                 </p>
               </div>
             </div>
+            
+            {registrationError && (
+              <div className="bg-red-50 border border-red-100 p-4 rounded-md flex gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-red-800">
+                  <p className="font-medium">Registration Error</p>
+                  <p>{registrationError}</p>
+                  <p className="mt-2">You may need to try again with a different email.</p>
+                </div>
+              </div>
+            )}
+            
+            <div className="bg-blue-50 border border-blue-100 p-4 rounded-md flex gap-3">
+              <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium">Troubleshooting Email Issues</p>
+                <p>If you don't receive an email within a few minutes:</p>
+                <ul className="list-disc pl-5 mt-1">
+                  <li>Check your spam or junk folders</li>
+                  <li>Try registering with a different email provider</li>
+                  <li>Try using a personal email account instead of a work email</li>
+                </ul>
+              </div>
+            </div>
           </CardContent>
           
           <CardFooter className="flex flex-col gap-3">
@@ -112,6 +143,15 @@ const Register = () => {
             >
               Go to Sign In
             </Button>
+            
+            <Button
+              onClick={handleCheckAuthSettings}
+              variant="outline"
+              className="w-full"
+            >
+              Check Auth Settings
+            </Button>
+            
             <p className="text-xs text-gray-500 text-center">
               Didn't receive the email? Check your spam folder or try again.
             </p>
@@ -255,7 +295,7 @@ const Register = () => {
           </form>
         </CardContent>
         
-        <CardFooter className="flex justify-center">
+        <CardFooter className="flex justify-center flex-col gap-2">
           <p className="text-center text-sm text-gray-600">
             Already have an account?{" "}
             <a 
@@ -265,6 +305,15 @@ const Register = () => {
               Sign in
             </a>
           </p>
+          
+          <Button
+            onClick={handleCheckAuthSettings}
+            variant="ghost"
+            size="sm"
+            className="text-xs text-gray-500"
+          >
+            Check Auth Settings
+          </Button>
         </CardFooter>
       </Card>
     </div>
