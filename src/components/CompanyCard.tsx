@@ -1,13 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Company } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, TrendingUp, Star, Edit } from "lucide-react";
+import { DollarSign, TrendingUp, Star, Edit, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import MessagingModal from "./MessagingModal";
 
 interface CompanyCardProps {
   company: Company;
@@ -17,8 +18,9 @@ interface CompanyCardProps {
 const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = false }) => {
   const { toast: uiToast } = useToast();
   const { user } = useAuth();
-  const [isSaved, setIsSaved] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMessagingOpen, setIsMessagingOpen] = useState(false);
   const navigate = useNavigate();
   
   React.useEffect(() => {
@@ -44,11 +46,18 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
     checkIfSaved();
   }, [company.id, user]);
   
-  const handleGetContact = () => {
-    uiToast({
-      title: "Contact Details",
-      description: "Feature coming soon! This will require payment to unlock contact details.",
-    });
+  const handleContactFounder = () => {
+    if (!user) {
+      toast("Please sign in to contact founders");
+      return;
+    }
+    
+    if (user.role !== "investor") {
+      toast("Only investors can contact founders");
+      return;
+    }
+
+    setIsMessagingOpen(true);
   };
   
   const handleSaveToggle = async () => {
@@ -152,11 +161,19 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
       
       {showContactButton && (
         <Button 
-          onClick={handleGetContact}
+          onClick={handleContactFounder}
           className="w-full text-white transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-[#ff4141] to-[#ff6b41]"
         >
-          Get Contact Details <DollarSign className="h-4 w-4 animate-pulse" />
+          Contact Founder <MessageCircle className="h-4 w-4" />
         </Button>
+      )}
+
+      {isMessagingOpen && (
+        <MessagingModal 
+          isOpen={isMessagingOpen} 
+          onClose={() => setIsMessagingOpen(false)} 
+          company={company} 
+        />
       )}
     </div>
   );

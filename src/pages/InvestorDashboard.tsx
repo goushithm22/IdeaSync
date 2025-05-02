@@ -2,18 +2,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { Search, Star, Settings } from "lucide-react";
+import { Search, Star, Settings, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Company } from "@/types";
 import Header from "@/components/Header";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Import the new components
+// Import the components
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import CompanyDiscovery from "@/components/dashboard/investor/CompanyDiscovery";
 import SavedCompanies from "@/components/dashboard/investor/SavedCompanies";
 import InvestorProfile from "@/components/dashboard/investor/InvestorProfile";
+import MessageInbox from "@/components/dashboard/MessageInbox";
 
 const InvestorDashboard = () => {
   const { user, refreshSession } = useAuth();
@@ -36,6 +37,12 @@ const InvestorDashboard = () => {
       label: "Saved Startups",
       icon: <Star />,
       tooltip: "Saved Startups"
+    },
+    {
+      id: "messages",
+      label: "Messages",
+      icon: <MessageCircle />,
+      tooltip: "Messages"
     },
     {
       id: "settings",
@@ -157,6 +164,10 @@ const InvestorDashboard = () => {
             
             {activeTab === "saved" && (
               <SavedCompanies />
+            )}
+            
+            {activeTab === "messages" && (
+              <MessageInbox />
             )}
             
             {activeTab === "settings" && (

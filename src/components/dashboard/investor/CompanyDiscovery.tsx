@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Company } from "@/types";
 import { Input } from "@/components/ui/input";
 import CompanyCard from "@/components/CompanyCard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CompanyDiscoveryProps {
   companies: Company[];
@@ -36,16 +37,20 @@ const CompanyDiscovery: React.FC<CompanyDiscoveryProps> = ({ companies, isLoadin
           />
         </div>
         
-        <select
+        <Select
           value={selectedSector}
-          onChange={(e) => setSelectedSector(e.target.value)}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          onValueChange={setSelectedSector}
         >
-          <option value="">All Sectors</option>
-          {sectors.map((sector) => (
-            <option key={sector} value={sector}>{sector}</option>
-          ))}
-        </select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Sectors" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Sectors</SelectItem>
+            {sectors.map((sector) => (
+              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       {isLoading ? (
