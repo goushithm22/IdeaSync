@@ -14,11 +14,11 @@ const CompanyDiscovery: React.FC<CompanyDiscoveryProps> = ({ companies, isLoadin
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSector, setSelectedSector] = useState<string>("");
 
-  const sectors = [...new Set(companies.map(company => company.sector))];
+  const sectors = [...new Set(companies.map(company => company.sector))].filter(Boolean);
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                      company.description.toLowerCase().includes(searchTerm.toLowerCase());
+                      company.description?.toLowerCase().includes(searchTerm.toLowerCase() || "");
     const matchesSector = selectedSector ? company.sector === selectedSector : true;
     return matchesSearch && matchesSector;
   });
@@ -45,9 +45,9 @@ const CompanyDiscovery: React.FC<CompanyDiscoveryProps> = ({ companies, isLoadin
             <SelectValue placeholder="All Sectors" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Sectors</SelectItem>
+            <SelectItem value="all">All Sectors</SelectItem>
             {sectors.map((sector) => (
-              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+              sector && <SelectItem key={sector} value={sector}>{sector}</SelectItem>
             ))}
           </SelectContent>
         </Select>

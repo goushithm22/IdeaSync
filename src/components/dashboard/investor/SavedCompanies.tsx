@@ -13,7 +13,7 @@ const SavedCompanies: React.FC = () => {
   const [savedCompanies, setSavedCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, session, refreshSession } = useAuth();
+  const { user, refreshSession } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

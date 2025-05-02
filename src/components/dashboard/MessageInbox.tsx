@@ -7,6 +7,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface MessageSender {
+  name: string;
+  role: string;
+}
+
+interface MessageCompany {
+  name: string;
+}
+
 interface Message {
   id: string;
   sender_id: string;
@@ -15,13 +24,8 @@ interface Message {
   created_at: string;
   read: boolean;
   company_id: string;
-  company?: {
-    name: string;
-  };
-  sender?: {
-    name: string;
-    role: string;
-  };
+  company?: MessageCompany;
+  sender?: MessageSender;
 }
 
 const MessageInbox: React.FC = () => {
@@ -42,10 +46,6 @@ const MessageInbox: React.FC = () => {
           *,
           company:company_id (
             name
-          ),
-          sender:sender_id (
-            name,
-            role
           )
         `)
         .or(`receiver_id.eq.${user.id},sender_id.eq.${user.id}`)
@@ -53,7 +53,26 @@ const MessageInbox: React.FC = () => {
       
       if (error) throw error;
       
-      setMessages(data || []);
+      // Fetch sender info for each message
+      if (data && data.length > 0) {
+        const messagesWithSenders = await Promise.all(
+          data.map(async (message) => {
+            const { data: senderData } = await supabase
+              .from('profiles')
+              .select('name, role')
+              .eq('id', message.sender_id)
+              .single();
+
+            return {
+              ...message,
+              sender: senderData || { name: 'Unknown User', role: 'unknown' }
+            };
+          })
+        );
+        setMessages(messagesWithSenders);
+      } else {
+        setMessages([]);
+      }
     } catch (error: any) {
       console.error("Error fetching messages:", error);
       toast.error("Failed to load messages");
@@ -146,7 +165,7 @@ const MessageInbox: React.FC = () => {
             </Button>
             <CardTitle className="text-lg">
               {selectedMessage.sender?.role === 'investor' ? 'Message about ' : 'Message from '} 
-              {selectedMessage.company?.name}
+              {selectedMessage.company?.name || 'Unknown Company'}
             </CardTitle>
             <div className="flex items-center justify-between mt-1 text-sm text-gray-500">
               <span>From: {selectedMessage.sender?.name || 'Unknown'}</span>
