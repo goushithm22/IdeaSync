@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import FounderDashboard from "./pages/FounderDashboard";
 import InvestorDashboard from "./pages/InvestorDashboard";
 import NewCompany from "./pages/NewCompany";
+import EditCompany from "./pages/EditCompany";
 import NotFound from "./pages/NotFound";
 import ConfirmEmail from "./pages/ConfirmEmail";
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/?error=*" element={<Navigate to="/confirm-email" />} />
             <Route path="/founder-dashboard" element={<FounderDashboard />} />
             <Route path="/founder-dashboard/new-company" element={<NewCompany />} />
+            <Route path="/founder-dashboard/edit-company/:id" element={<EditCompany />} />
             <Route path="/investor-dashboard" element={<InvestorDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

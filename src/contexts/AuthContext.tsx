@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, UserRole } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -88,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Check Supabase auth settings
-  const checkAuthSettings = async () => {
+  const checkAuthSettings = async (): Promise<void> => {
     try {
       console.log("Checking Supabase auth settings...");
       
@@ -111,12 +110,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       );
       
       toast.info("Auth settings check complete. See console for details.");
-      
-      // Return a summary of the checks
-      return {
-        sessionCapability: !!gotSession,
-        passwordRecoveryCapability: !recoveryError
-      };
     } catch (error: any) {
       console.error("Auth settings check exception:", error);
       toast.error("Error checking auth settings");

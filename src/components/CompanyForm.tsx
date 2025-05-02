@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,22 +8,40 @@ import { useToast } from "@/hooks/use-toast";
 import { Company } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface CompanyFormProps {
   onSave: (company: Omit<Company, "id" | "founderId">) => void;
   isLoading?: boolean;
+  initialData?: Company;
+  isEditing?: boolean;
 }
 
-const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [sector, setSector] = useState("");
-  const [fundingGoal, setFundingGoal] = useState<number | undefined>(undefined);
+const CompanyForm: React.FC<CompanyFormProps> = ({ 
+  onSave, 
+  isLoading = false,
+  initialData,
+  isEditing = false
+}) => {
+  const [name, setName] = useState(initialData?.name || "");
+  const [description, setDescription] = useState(initialData?.description || "");
+  const [sector, setSector] = useState(initialData?.sector || "");
+  const [fundingGoal, setFundingGoal] = useState<number | undefined>(initialData?.fundingGoal);
   const [submitting, setSubmitting] = useState(false);
   
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const { user } = useAuth();
+
+  // Update form fields if initialData changes (e.g., when data is loaded)
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setDescription(initialData.description || "");
+      setSector(initialData.sector || "");
+      setFundingGoal(initialData.fundingGoal);
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,20 +76,32 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) 
     };
     
     try {
-      // Insert the company into the database
-      const { data, error } = await supabase
-        .from('companies')
-        .insert(companyData)
-        .select();
-      
-      if (error) {
-        throw error;
+      if (isEditing && initialData) {
+        // Update existing company
+        const { data, error } = await supabase
+          .from('companies')
+          .update(companyData)
+          .eq('id', initialData.id)
+          .select();
+        
+        if (error) {
+          throw error;
+        }
+        
+        toast.success("Company updated successfully");
+      } else {
+        // Insert new company
+        const { data, error } = await supabase
+          .from('companies')
+          .insert(companyData)
+          .select();
+        
+        if (error) {
+          throw error;
+        }
+        
+        toast.success("Company saved successfully");
       }
-      
-      toast({
-        title: "Success",
-        description: "Company saved successfully",
-      });
       
       // Call the onSave prop to maintain compatibility
       onSave({
@@ -84,11 +114,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) 
       navigate("/founder-dashboard");
     } catch (error: any) {
       console.error("Error saving company:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to save company",
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to save company");
     } finally {
       setSubmitting(false);
     }
@@ -155,7 +181,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ onSave, isLoading = false }) 
           className="bg-gray-900 hover:bg-gray-800 text-white" 
           disabled={isLoading || submitting}
         >
-          {submitting ? "Saving..." : "Save Company"}
+          {submitting ? (isEditing ? "Updating..." : "Saving...") : (isEditing ? "Update Company" : "Save Company")}
         </Button>
         <Button 
           type="button" 

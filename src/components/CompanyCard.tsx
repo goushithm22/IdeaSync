@@ -3,10 +3,11 @@ import React from "react";
 import { Company } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, TrendingUp, Star } from "lucide-react";
+import { DollarSign, TrendingUp, Star, Edit } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface CompanyCardProps {
   company: Company;
@@ -18,6 +19,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
   const { user } = useAuth();
   const [isSaved, setIsSaved] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
   
   React.useEffect(() => {
     if (!user || user.role !== "investor") return;
@@ -98,6 +100,12 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
     }
   };
 
+  const handleEdit = () => {
+    navigate(`/founder-dashboard/edit-company/${company.id}`);
+  };
+
+  const isOwner = user && user.id === company.founderId;
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 transform transition-all duration-300 hover:shadow-lg hover:-translate-y-2 hover:border-[#ff4141]/30 animate-fade-in">
       <div className="flex justify-between items-start mb-3">
@@ -124,6 +132,18 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
           >
             <Star className={`h-3 w-3 mr-1 ${isSaved ? 'fill-[#ff4141]' : ''}`} />
             {isSaved ? 'Saved' : 'Save'}
+          </Button>
+        )}
+
+        {isOwner && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 px-3 text-xs text-gray-700 hover:text-[#ff4141]"
+            onClick={handleEdit}
+          >
+            <Edit className="h-3 w-3 mr-1" />
+            Edit
           </Button>
         )}
       </div>
