@@ -47,8 +47,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({
     e.preventDefault();
     
     if (!user) {
-      toast({
-        title: "Error",
+      uiToast({
         description: "You must be logged in to save a company",
         variant: "destructive",
       });
@@ -56,8 +55,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({
     }
     
     if (!name || !description || !sector) {
-      toast({
-        title: "Error",
+      uiToast({
         description: "Please fill in all required fields",
         variant: "destructive",
       });
