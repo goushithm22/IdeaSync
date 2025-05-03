@@ -49,6 +49,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
   const handleContactFounder = () => {
     if (!user) {
       toast("Please sign in to contact founders");
+      navigate('/signin');
       return;
     }
     
@@ -63,6 +64,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
   const handleSaveToggle = async () => {
     if (!user) {
       toast("Please sign in to save companies");
+      navigate('/signin');
       return;
     }
     
