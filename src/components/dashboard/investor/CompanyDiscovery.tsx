@@ -45,7 +45,7 @@ const CompanyDiscovery: React.FC<CompanyDiscoveryProps> = ({ companies, isLoadin
             <SelectValue placeholder="All Sectors" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Sectors</SelectItem>
+            <SelectItem value="">All Sectors</SelectItem>
             {sectors.map((sector) => (
               sector && <SelectItem key={sector} value={sector}>{sector}</SelectItem>
             ))}

@@ -20,7 +20,7 @@ const Register = () => {
   const [registrationComplete, setRegistrationComplete] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
   
-  const { register, user, checkAuthSettings } = useAuth();
+  const { register, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -68,10 +68,6 @@ const Register = () => {
       navigate(user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
     }
   }, [user, navigate]);
-
-  const handleCheckAuthSettings = async () => {
-    await checkAuthSettings();
-  };
 
   if (registrationComplete) {
     return (
@@ -142,14 +138,6 @@ const Register = () => {
               className="w-full bg-[#ff4141] hover:bg-[#ff4141]/90 text-white"
             >
               Go to Sign In
-            </Button>
-            
-            <Button
-              onClick={handleCheckAuthSettings}
-              variant="outline"
-              className="w-full"
-            >
-              Check Auth Settings
             </Button>
             
             <p className="text-xs text-gray-500 text-center">
@@ -295,7 +283,7 @@ const Register = () => {
           </form>
         </CardContent>
         
-        <CardFooter className="flex justify-center flex-col gap-2">
+        <CardFooter className="flex justify-center">
           <p className="text-center text-sm text-gray-600">
             Already have an account?{" "}
             <a 
@@ -305,15 +293,6 @@ const Register = () => {
               Sign in
             </a>
           </p>
-          
-          <Button
-            onClick={handleCheckAuthSettings}
-            variant="ghost"
-            size="sm"
-            className="text-xs text-gray-500"
-          >
-            Check Auth Settings
-          </Button>
         </CardFooter>
       </Card>
     </div>
