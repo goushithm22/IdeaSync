@@ -3,12 +3,11 @@ import React, { useState } from "react";
 import { Company } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, TrendingUp, Star, Edit, MessageCircle } from "lucide-react";
+import { DollarSign, TrendingUp, Star, Edit } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import MessagingModal from "./MessagingModal";
 
 interface CompanyCardProps {
   company: Company;
@@ -20,7 +19,6 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
   const { user } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMessagingOpen, setIsMessagingOpen] = useState(false);
   const navigate = useNavigate();
   
   React.useEffect(() => {
@@ -46,19 +44,19 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
     checkIfSaved();
   }, [company.id, user]);
   
-  const handleContactFounder = () => {
+  const handleConnectNow = () => {
     if (!user) {
-      toast("Please sign in to contact founders");
+      toast("Please sign in to connect with founders");
       navigate('/signin');
       return;
     }
     
     if (user.role !== "investor") {
-      toast("Only investors can contact founders");
+      toast("Only investors can connect with founders");
       return;
     }
 
-    setIsMessagingOpen(true);
+    toast.success(`Connect request sent to ${company.name}`);
   };
   
   const handleSaveToggle = async () => {
@@ -163,19 +161,11 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, showContactButton = 
       
       {showContactButton && (
         <Button 
-          onClick={handleContactFounder}
+          onClick={handleConnectNow}
           className="w-full text-white transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-[#ff4141] to-[#ff6b41]"
         >
-          Contact Founder <MessageCircle className="h-4 w-4" />
+          Connect Now
         </Button>
-      )}
-
-      {isMessagingOpen && (
-        <MessagingModal 
-          isOpen={isMessagingOpen} 
-          onClose={() => setIsMessagingOpen(false)} 
-          company={company} 
-        />
       )}
     </div>
   );
