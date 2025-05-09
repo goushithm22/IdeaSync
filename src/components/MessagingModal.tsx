@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { Company } from "@/types";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MessagingModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface MessagingModalProps {
 const MessagingModal: React.FC<MessagingModalProps> = ({ isOpen, onClose, company }) => {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const { user } = useAuth();
 
   const handleSendMessage = async () => {
     if (!message.trim()) {
@@ -23,18 +25,17 @@ const MessagingModal: React.FC<MessagingModalProps> = ({ isOpen, onClose, compan
       return;
     }
 
+    if (!user) {
+      toast.error("You must be logged in to send messages");
+      return;
+    }
+
     setIsSending(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !userData.user) {
-        throw new Error("You must be logged in to send messages");
-      }
-
       const { error } = await supabase
         .from("messages")
         .insert({
-          sender_id: userData.user.id,
+          sender_id: user.id,
           receiver_id: company.founderId,
           company_id: company.id,
           content: message.trim(),
