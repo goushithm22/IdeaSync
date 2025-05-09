@@ -12,14 +12,14 @@ interface CompanyDiscoveryProps {
 
 const CompanyDiscovery: React.FC<CompanyDiscoveryProps> = ({ companies, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSector, setSelectedSector] = useState<string>("");
+  const [selectedSector, setSelectedSector] = useState<string>("all");
 
   const sectors = [...new Set(companies.map(company => company.sector))].filter(Boolean);
 
   const filteredCompanies = companies.filter((company) => {
     const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                       company.description?.toLowerCase().includes(searchTerm.toLowerCase() || "");
-    const matchesSector = selectedSector ? company.sector === selectedSector : true;
+    const matchesSector = selectedSector === "all" ? true : company.sector === selectedSector;
     return matchesSearch && matchesSector;
   });
 
@@ -45,7 +45,7 @@ const CompanyDiscovery: React.FC<CompanyDiscoveryProps> = ({ companies, isLoadin
             <SelectValue placeholder="All Sectors" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Sectors</SelectItem>
+            <SelectItem value="all">All Sectors</SelectItem>
             {sectors.map((sector) => (
               sector && <SelectItem key={sector} value={sector}>{sector}</SelectItem>
             ))}
