@@ -25,10 +25,12 @@ const SignIn = () => {
     
     try {
       await login(email, password);
-      
       toast.success("Login successful");
+      
+      // After successful login, let's redirect based on user role
+      // The actual redirect will be handled by useEffect below
     } catch (error: any) {
-      console.error(error);
+      console.error("Login error:", error);
       uiToast({
         title: "Error",
         description: error.message || "Invalid email or password",
@@ -41,9 +43,17 @@ const SignIn = () => {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (user) {
-      navigate(user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard");
-    }
+    const checkAndRedirect = async () => {
+      console.log("Current user:", user);
+      
+      if (user) {
+        const redirectPath = user.role === "founder" ? "/founder-dashboard" : "/investor-dashboard";
+        console.log(`Redirecting to ${redirectPath}`);
+        navigate(redirectPath, { replace: true });
+      }
+    };
+    
+    checkAndRedirect();
   }, [user, navigate]);
 
   return (

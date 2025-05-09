@@ -34,17 +34,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Fetch user data including custom fields from profiles table
   const fetchUserData = async (userId: string) => {
     try {
+      console.log("Fetching profile data for user:", userId);
       const { data: profileData, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile data:", error);
+        throw error;
+      }
       
+      console.log("Profile data fetched:", profileData);
       return profileData;
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error("Error in fetchUserData:", error);
       return null;
     }
   };
@@ -54,17 +59,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const fetchUser = async () => {
       setLoading(true);
       try {
+        console.log("Checking current session");
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
+          console.error("Session error:", error);
           throw error;
         }
         
         // If we have a session, get the user profile
         if (session?.user) {
+          console.log("Session found, user ID:", session.user.id);
           const profileData = await fetchUserData(session.user.id);
           
           if (profileData) {
+            console.log("Setting user data from profile");
             setUser({
               id: session.user.id,
               email: session.user.email || "",
@@ -73,6 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
           } else {
             // If no profile data, set minimal user info
+            console.log("No profile data found, using metadata");
             setUser({
               id: session.user.id,
               email: session.user.email || "",
@@ -81,6 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
           }
         } else {
+          console.log("No session found");
           setUser(null);
         }
       } catch (error) {
@@ -97,7 +108,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state change:", event);
+        
         if (session?.user) {
+          console.log("User authenticated:", session.user.id);
           const profileData = await fetchUserData(session.user.id);
           
           if (profileData) {
@@ -116,6 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
           }
         } else {
+          console.log("No user in session");
           setUser(null);
         }
         setLoading(false);
@@ -123,13 +138,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 
     return () => {
-      authListener.subscription.unsubscribe();
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
     };
   }, []);
 
   // Handle login
   const login = async (email: string, password: string) => {
     try {
+      console.log("Attempting login for:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -137,7 +155,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (error) throw error;
       
+      console.log("Login successful");
     } catch (error: any) {
+      console.error("Login error:", error);
       toast.error(error.message || "Failed to sign in");
       throw error;
     }
@@ -151,6 +171,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     role: UserRole
   ) => {
     try {
+      console.log("Registering new user:", email, "with role:", role);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -165,11 +186,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
       
       if (data.user) {
+        console.log("Registration successful for user:", data.user.id);
         toast.success(
           "Your account has been created! Please check your email for verification."
         );
       }
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast.error(error.message || "Failed to register");
       throw error;
     }
@@ -178,10 +201,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Handle logout
   const logout = async () => {
     try {
+      console.log("Logging out");
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setUser(null);
+      console.log("Logout successful");
     } catch (error: any) {
+      console.error("Logout error:", error);
       toast.error(error.message || "Failed to sign out");
     }
   };
@@ -189,6 +215,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Refresh session
   const refreshSession = async () => {
     try {
+      console.log("Refreshing session");
       const { error } = await supabase.auth.refreshSession();
       if (error) throw error;
       
@@ -196,6 +223,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
+        console.log("Session refreshed for user:", session.user.id);
         const profileData = await fetchUserData(session.user.id);
         
         if (profileData) {
