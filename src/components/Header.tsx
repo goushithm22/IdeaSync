@@ -16,7 +16,7 @@ const Header = () => {
         className="text-xl font-semibold tracking-tighter text-gray-900 transform transition-all duration-300 hover:scale-110"
       >
         <span className="text-[#ff4141] font-bold animate-pulse">idea</span>
-        <span className="bg-gradient-to-r from-gray-900 to-[#ff4141] bg-clip-text text-transparent">sync</span>
+        <span className="text-black font-bold">sync</span>
       </Link>
       
       <div className="flex gap-4">
