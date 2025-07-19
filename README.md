@@ -1,69 +1,118 @@
-# Welcome to your Lovable project
+# WebStory Builder 📖✨
 
-## Project info
+**WebStory Builder** is a creative web app that lets users build simple story-based content using structured layouts.  
+This project helped me practice **modular layout design**, improve **front-end code organization**, and explore how visual storytelling elements can be represented using HTML, CSS, and JavaScript.
 
-**URL**: https://lovable.dev/projects/9831156e-451d-40b1-bca7-98734a30efb6
+> 💡 Some sections of this project were refined with the help of **AI-assisted tools** to improve layout structure and streamline the development process.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🎯 Project Goal
 
-**Use Lovable**
+To build a user interface for creating web-based story slides, with a focus on:
+- Clean, customizable layout sections
+- Creative use of HTML/CSS positioning
+- Structuring reusable story "cards" or "slides"
+- Improving UI component hierarchy and flow
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9831156e-451d-40b1-bca7-98734a30efb6) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Features
 
-**Use your preferred IDE**
+- 🧩 Slide-like **story sections** that users can visualize in order
+- 🎨 Simple UI styling focused on layout consistency
+- 🖼️ Image, text, and content blocks mimicking real-world "Web Stories"
+- 📱 Responsive and flexible design approach
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🧠 What I Focused On
 
-Follow these steps:
+- Structuring UI components with clear boundaries and styling
+- Using **semantic HTML elements** for content flow
+- Understanding **positioning**, **flex**, and **container patterns**
+- Keeping **CSS modular and readable**
+- Experimenting with UI/UX patterns seen in content platforms (e.g., Instagram Stories, Google Web Stories)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🧱 Tech Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **HTML5** – For semantic structure of story blocks  
+- **CSS3** – Styling with layout responsiveness and visual structure  
+- **JavaScript (Vanilla)** – *(Optional)* For interactivity or navigation logic  
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+---
+
+## 📁 Folder Structure
+
+```bash
+webstory-builder/
+│
+├── index.html         # Base HTML structure
+├── styles.css         # Design and layout styles
+└── script.js          # (Optional) Add navigation or animations between slides
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🧪 Key Learning Outcomes
 
-**Use GitHub Codespaces**
+- Built multi-section layouts using **containers, grids, and flex**
+- Gained experience in **responsive block-based design**
+- Structured components in a scalable way for future story elements
+- Practiced clean separation between content (HTML) and presentation (CSS)
+- Leveraged AI assistance for **code suggestions and layout refinement**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 📸 Screenshots
 
-This project is built with .
+*Add screenshots of story layout views here — desktop and mobile recommended.*
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## ▶️ Run It Locally
 
-Simply open [Lovable](https://lovable.dev/projects/9831156e-451d-40b1-bca7-98734a30efb6) and click on Share -> Publish.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/goushithm22/webstory-builder.git
+   cd webstory-builder
+   ```
+2. Open `index.html` in your browser or run using Live Server in your code editor.
 
-## I want to use a custom domain - is that possible?
+---
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 🧩 Future Improvements
+
+- Add controls to **navigate between slides** (next/prev)
+- Enable **drag-and-drop or WYSIWYG editor** for creating new stories
+- Include animations/transitions between story pages
+- Option to export or download stories as HTML/PDF
+
+---
+
+## 📄 License
+
+Licensed under the **MIT License** – feel free to use, remix, and expand!
+
+---
+
+## 🙌 Acknowledgements
+
+
+- Built with a mix of personal effort and **AI-assisted insights** for layout structuring and design guidance.
+
+---
+
+## 🚀 My Learning Journey
+
+| Project             | Focus Area                          |
+|---------------------|-------------------------------------|
+| YouTube Clone       | HTML/CSS Layout Fundamentals        |
+| MoveIt              | Bootstrap Basics                    |
+| GrowGreen           | Clean Code + Design Principles      |
+| Countdown Timer     | JavaScript & DOM Manipulation       |
+| TinDog              | Bootstrap Mastery & UX Layout       |
+| **WebStory Builder**| UI/UX Creativity & Component Design |
+
