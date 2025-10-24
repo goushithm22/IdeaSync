@@ -15,6 +15,4 @@ export interface Company {
   sector: string;
   founderId: string;
   fundingGoal?: number;
-  pitchDeck?: string;
-  contactDetails?: string;
 }

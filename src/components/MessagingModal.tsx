@@ -36,7 +36,7 @@ const MessagingModal: React.FC<MessagingModalProps> = ({ isOpen, onClose, compan
         .from("messages")
         .insert({
           sender_id: user.id,
-          receiver_id: company.founderId,
+          recipient_id: company.founderId,
           company_id: company.id,
           content: message.trim(),
         });

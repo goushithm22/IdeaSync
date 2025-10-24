@@ -86,9 +86,7 @@ const InvestorDashboard = () => {
           description: item.description || "",
           sector: item.sector || "",
           founderId: item.founder_id,
-          fundingGoal: item.funding_goal,
-          pitchDeck: item.pitch_deck,
-          contactDetails: item.contact_details
+          fundingGoal: item.funding_goal
         }));
         
         setCompanies(transformedCompanies);

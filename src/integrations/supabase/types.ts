@@ -14,16 +14,175 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          created_at: string
+          description: string
+          founder_id: string
+          funding_goal: number
+          id: string
+          name: string
+          sector: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          founder_id: string
+          funding_goal: number
+          id?: string
+          name: string
+          sector: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          founder_id?: string
+          funding_goal?: number
+          id?: string
+          name?: string
+          sector?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      investments: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          id: string
+          investor_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          id?: string
+          investor_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          id?: string
+          investor_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          company_id: string | null
+          content: string
+          created_at: string
+          id: string
+          read: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          company_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "founder" | "investor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +309,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["founder", "investor"],
+    },
   },
 } as const

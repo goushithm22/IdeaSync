@@ -19,7 +19,7 @@ interface MessageCompany {
 interface Message {
   id: string;
   sender_id: string;
-  receiver_id: string;
+  recipient_id: string;
   content: string;
   created_at: string;
   read: boolean;
@@ -39,7 +39,7 @@ const MessageInbox: React.FC = () => {
     
     setIsLoading(true);
     try {
-      // Fetch messages where user is sender or receiver
+      // Fetch messages where user is sender or recipient
       const { data, error } = await supabase
         .from('messages')
         .select(`
@@ -48,7 +48,7 @@ const MessageInbox: React.FC = () => {
             name
           )
         `)
-        .or(`receiver_id.eq.${user.id},sender_id.eq.${user.id}`)
+        .or(`recipient_id.eq.${user.id},sender_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -57,15 +57,26 @@ const MessageInbox: React.FC = () => {
       if (data && data.length > 0) {
         const messagesWithSenders = await Promise.all(
           data.map(async (message) => {
-            const { data: senderData } = await supabase
+            // Get sender profile
+            const { data: senderProfile } = await supabase
               .from('profiles')
-              .select('name, role')
+              .select('name')
               .eq('id', message.sender_id)
+              .single();
+            
+            // Get sender role
+            const { data: senderRole } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', message.sender_id)
               .single();
 
             return {
               ...message,
-              sender: senderData || { name: 'Unknown User', role: 'unknown' }
+              sender: { 
+                name: senderProfile?.name || 'Unknown User', 
+                role: senderRole?.role || 'unknown' 
+              }
             };
           })
         );
@@ -91,7 +102,7 @@ const MessageInbox: React.FC = () => {
         .from('messages')
         .update({ read: true })
         .eq('id', messageId)
-        .eq('receiver_id', user?.id);
+        .eq('recipient_id', user?.id);
       
       if (error) throw error;
       
@@ -107,8 +118,8 @@ const MessageInbox: React.FC = () => {
   const handleSelectMessage = (message: Message) => {
     setSelectedMessage(message);
     
-    // If user is receiver and message is unread, mark as read
-    if (user?.id === message.receiver_id && !message.read) {
+    // If user is recipient and message is unread, mark as read
+    if (user?.id === message.recipient_id && !message.read) {
       markAsRead(message.id);
     }
   };
@@ -196,7 +207,7 @@ const MessageInbox: React.FC = () => {
                 <Card 
                   key={message.id} 
                   className={`cursor-pointer transition-colors hover:border-gray-300 ${
-                    user.id === message.receiver_id && !message.read 
+                    user.id === message.recipient_id && !message.read 
                       ? 'border-l-4 border-l-[#ff4141]' 
                       : ''
                   }`}

@@ -31,23 +31,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user data including custom fields from profiles table
+  // Fetch user data including custom fields from profiles and roles tables
   const fetchUserData = async (userId: string) => {
     try {
       console.log("Fetching profile data for user:", userId);
-      const { data: profileData, error } = await supabase
+      
+      // Fetch profile
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
       
-      if (error) {
-        console.error("Error fetching profile data:", error);
-        throw error;
+      if (profileError) {
+        console.error("Error fetching profile data:", profileError);
+      }
+      
+      // Fetch roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+      
+      if (rolesError) {
+        console.error("Error fetching roles data:", rolesError);
       }
       
       console.log("Profile data fetched:", profileData);
-      return profileData;
+      console.log("Roles data fetched:", rolesData);
+      
+      // Get the primary role (first role)
+      const primaryRole = rolesData && rolesData.length > 0 ? rolesData[0].role : null;
+      
+      return {
+        profile: profileData,
+        role: primaryRole
+      };
     } catch (error) {
       console.error("Error in fetchUserData:", error);
       return null;
@@ -70,15 +89,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // If we have a session, get the user profile
         if (session?.user) {
           console.log("Session found, user ID:", session.user.id);
-          const profileData = await fetchUserData(session.user.id);
+          const userData = await fetchUserData(session.user.id);
           
-          if (profileData) {
+          if (userData && userData.profile) {
             console.log("Setting user data from profile");
             setUser({
               id: session.user.id,
               email: session.user.email || "",
-              name: profileData.name || "User",
-              role: profileData.role as UserRole || "founder"
+              name: userData.profile.name || "User",
+              role: (userData.role as UserRole) || "founder"
             });
           } else {
             // If no profile data, set minimal user info
@@ -112,14 +131,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (session?.user) {
           console.log("User authenticated:", session.user.id);
-          const profileData = await fetchUserData(session.user.id);
+          const userData = await fetchUserData(session.user.id);
           
-          if (profileData) {
+          if (userData && userData.profile) {
             setUser({
               id: session.user.id,
               email: session.user.email || "",
-              name: profileData.name || "User",
-              role: profileData.role as UserRole || "founder"
+              name: userData.profile.name || "User",
+              role: (userData.role as UserRole) || "founder"
             });
           } else {
             setUser({
@@ -176,6 +195,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             name,
             role
@@ -187,8 +207,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (data.user) {
         console.log("Registration successful for user:", data.user.id);
+        
+        // Create profile entry
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .insert({
+            id: data.user.id,
+            email: email,
+            name: name
+          });
+        
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+        }
+        
+        // Create role entry
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({
+            user_id: data.user.id,
+            role: role
+          });
+        
+        if (roleError) {
+          console.error("Error creating role:", roleError);
+        }
+        
         toast.success(
-          "Your account has been created! Please check your email for verification."
+          "Account created successfully!"
         );
       }
     } catch (error: any) {
@@ -224,14 +270,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (session?.user) {
         console.log("Session refreshed for user:", session.user.id);
-        const profileData = await fetchUserData(session.user.id);
+        const userData = await fetchUserData(session.user.id);
         
-        if (profileData) {
+        if (userData && userData.profile) {
           setUser({
             id: session.user.id,
             email: session.user.email || "",
-            name: profileData.name || "User",
-            role: profileData.role as UserRole || "founder"
+            name: userData.profile.name || "User",
+            role: (userData.role as UserRole) || "founder"
           });
         } else {
           setUser({

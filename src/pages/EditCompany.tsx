@@ -66,9 +66,7 @@ const EditCompany = () => {
           description: data.description || "",
           sector: data.sector || "",
           founderId: data.founder_id,
-          fundingGoal: data.funding_goal,
-          pitchDeck: data.pitch_deck,
-          contactDetails: data.contact_details
+          fundingGoal: data.funding_goal
         });
       } catch (error: any) {
         console.error("Error fetching company:", error);
